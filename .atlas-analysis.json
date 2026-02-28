@@ -1,0 +1,203 @@
+{
+  "projectType": "sdk-library",
+  "projectName": "FinMCP",
+  "projectDescription": "MCP server that provides AI assistants with access to comprehensive financial market data via yfinance",
+  "theme": "palm",
+  "primaryColor": "#10b981",
+  "lightColor": "#34d399",
+  "darkColor": "#059669",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "introduction",
+              "installation",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/mcp-architecture",
+              "concepts/output-formats",
+              "concepts/data-export"
+            ]
+          },
+          {
+            "group": "Integration Guides",
+            "pages": [
+              "integrations/claude",
+              "integrations/opencode",
+              "integrations/custom-clients"
+            ]
+          },
+          {
+            "group": "Examples",
+            "pages": [
+              "examples/market-analysis",
+              "examples/company-research",
+              "examples/portfolio-tracking"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Tool Reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "tools/overview"
+            ]
+          },
+          {
+            "group": "Market Data",
+            "pages": [
+              "tools/market-data/download",
+              "tools/market-data/history",
+              "tools/market-data/tickers-history"
+            ]
+          },
+          {
+            "group": "Company Information",
+            "pages": [
+              "tools/company/info",
+              "tools/company/fast-info",
+              "tools/company/news"
+            ]
+          },
+          {
+            "group": "Financial Statements",
+            "pages": [
+              "tools/financials/income-statement",
+              "tools/financials/balance-sheet",
+              "tools/financials/cash-flow",
+              "tools/financials/earnings"
+            ]
+          },
+          {
+            "group": "Corporate Actions",
+            "pages": [
+              "tools/actions/dividends",
+              "tools/actions/splits",
+              "tools/actions/capital-gains"
+            ]
+          },
+          {
+            "group": "Analyst Data",
+            "pages": [
+              "tools/analysts/recommendations",
+              "tools/analysts/price-targets",
+              "tools/analysts/estimates",
+              "tools/analysts/upgrades-downgrades"
+            ]
+          },
+          {
+            "group": "Ownership & Holdings",
+            "pages": [
+              "tools/ownership/major-holders",
+              "tools/ownership/institutional",
+              "tools/ownership/insider-transactions"
+            ]
+          },
+          {
+            "group": "Options",
+            "pages": [
+              "tools/options/options-chain"
+            ]
+          },
+          {
+            "group": "Screening & Discovery",
+            "pages": [
+              "tools/screening/search",
+              "tools/screening/lookup",
+              "tools/screening/screener",
+              "tools/screening/calendars"
+            ]
+          },
+          {
+            "group": "Markets & Sectors",
+            "pages": [
+              "tools/markets/market-summary",
+              "tools/markets/sectors",
+              "tools/markets/industries"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "tools/reference/field-definitions",
+              "tools/reference/field-categories"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "50+ MCP tools for comprehensive financial data access",
+    "Real-time and historical market data via yfinance",
+    "Company financials, earnings, and analyst estimates",
+    "Stock screening and equity/fund discovery",
+    "Flexible output formats (JSON, Markdown, CSV)",
+    "Data export capabilities for analysis",
+    "Sector, industry, and market-wide data",
+    "Options chains and derivatives data",
+    "Insider transactions and institutional holdings",
+    "Economic calendars and corporate events"
+  ],
+  "publicApiSurface": [
+    "yf_download",
+    "yf_ticker_history",
+    "yf_tickers_history",
+    "yf_ticker_info",
+    "yf_ticker_fast_info",
+    "yf_ticker_news",
+    "yf_tickers_news",
+    "yf_ticker_income_stmt",
+    "yf_ticker_balance_sheet",
+    "yf_ticker_cash_flow",
+    "yf_ticker_earnings",
+    "yf_ticker_earnings_dates",
+    "yf_ticker_calendar",
+    "yf_ticker_actions",
+    "yf_ticker_dividends",
+    "yf_ticker_splits",
+    "yf_ticker_capital_gains",
+    "yf_ticker_recommendations",
+    "yf_ticker_recommendations_summary",
+    "yf_ticker_upgrades_downgrades",
+    "yf_ticker_analyst_price_targets",
+    "yf_ticker_earnings_estimate",
+    "yf_ticker_revenue_estimate",
+    "yf_ticker_earnings_history",
+    "yf_ticker_eps_trend",
+    "yf_ticker_eps_revisions",
+    "yf_ticker_growth_estimates",
+    "yf_ticker_major_holders",
+    "yf_ticker_institutional_holders",
+    "yf_ticker_mutualfund_holders",
+    "yf_ticker_insider_purchases",
+    "yf_ticker_insider_transactions",
+    "yf_ticker_insider_roster_holders",
+    "yf_ticker_sustainability",
+    "yf_ticker_sec_filings",
+    "yf_ticker_shares",
+    "yf_ticker_shares_full",
+    "yf_ticker_funds_data",
+    "yf_ticker_options",
+    "yf_search",
+    "yf_lookup",
+    "yf_screen",
+    "yf_market",
+    "yf_sector",
+    "yf_industry",
+    "yf_calendars",
+    "yf_field_definitions",
+    "yf_field_categories"
+  ]
+}
