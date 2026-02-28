@@ -1,0 +1,316 @@
+---
+title: Analyst Estimates
+description: Access earnings, revenue, EPS, and growth estimates from analysts
+---
+
+## Overview
+
+Yahoo Finance provides comprehensive analyst estimate data across multiple dimensions. These tools help you understand forward-looking expectations for company performance.
+
+## Available Tools
+
+- **yf_ticker_earnings_estimate** - Quarterly and annual earnings estimates
+- **yf_ticker_revenue_estimate** - Quarterly and annual revenue estimates
+- **yf_ticker_earnings_history** - Historical earnings vs. estimates
+- **yf_ticker_eps_trend** - EPS estimate trends over time
+- **yf_ticker_eps_revisions** - Recent EPS estimate revisions
+- **yf_ticker_growth_estimates** - Long-term growth projections
+
+---
+
+## yf_ticker_earnings_estimate
+
+Retrieves consensus earnings estimates for upcoming quarters and fiscal years.
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `ticker` | string | Yes | Ticker symbol (e.g., "AAPL") |
+| `response_format` | string | No | Output format: "json" (default) or "markdown" |
+| `preview_limit` | number | No | Max rows to preview (1-200, default: 25) |
+| `save` | object | No | Save options with `format` ("csv" or "json") and optional `filename` |
+
+### Response Data
+
+Returns a DataFrame with columns typically including:
+
+- **Period** - Fiscal period (e.g., 0q, +1q, 0y, +1y)
+- **Avg. Estimate** - Mean earnings estimate
+- **Low Estimate** - Lowest analyst estimate
+- **High Estimate** - Highest analyst estimate
+- **No. of Analysts** - Number of analysts providing estimates
+- **Year Ago EPS** - EPS from same period last year
+
+### Example
+
+```typescript
+{
+  "ticker": "TSLA",
+  "response_format": "markdown"
+}
+```
+
+---
+
+## yf_ticker_revenue_estimate
+
+Retrieves consensus revenue estimates for upcoming quarters and fiscal years.
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `ticker` | string | Yes | Ticker symbol (e.g., "AAPL") |
+| `response_format` | string | No | Output format: "json" (default) or "markdown" |
+| `preview_limit` | number | No | Max rows to preview (1-200, default: 25) |
+| `save` | object | No | Save options with `format` ("csv" or "json") and optional `filename` |
+
+### Response Data
+
+Returns a DataFrame with columns similar to earnings estimates:
+
+- **Period** - Fiscal period
+- **Avg. Estimate** - Mean revenue estimate
+- **Low Estimate** - Lowest analyst estimate
+- **High Estimate** - Highest analyst estimate
+- **No. of Analysts** - Number of analysts providing estimates
+- **Sales Growth (year/est)** - Expected year-over-year growth
+
+### Example
+
+```typescript
+{
+  "ticker": "AMZN",
+  "response_format": "json"
+}
+```
+
+---
+
+## yf_ticker_earnings_history
+
+Provides historical comparison of actual earnings vs. analyst estimates.
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `ticker` | string | Yes | Ticker symbol (e.g., "AAPL") |
+| `response_format` | string | No | Output format: "json" (default) or "markdown" |
+| `preview_limit` | number | No | Max rows to preview (1-200, default: 25) |
+| `save` | object | No | Save options with `format` ("csv" or "json") and optional `filename` |
+
+### Response Data
+
+Returns a DataFrame showing:
+
+- **Quarter** - Earnings report quarter
+- **EPS Est.** - Analyst EPS estimate
+- **EPS Actual** - Actual reported EPS
+- **Difference** - Actual minus estimate
+- **Surprise %** - Percentage beat or miss
+
+### Purpose
+
+Use this tool to:
+
+- Track company's history of beating or missing estimates
+- Identify patterns in earnings surprises
+- Assess the reliability of analyst estimates for this company
+- Understand historical earnings volatility
+
+### Example
+
+```typescript
+{
+  "ticker": "NFLX",
+  "response_format": "markdown"
+}
+```
+
+---
+
+## yf_ticker_eps_trend
+
+Shows how EPS estimates have trended over different time periods.
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `ticker` | string | Yes | Ticker symbol (e.g., "AAPL") |
+| `response_format` | string | No | Output format: "json" (default) or "markdown" |
+| `preview_limit` | number | No | Max rows to preview (1-200, default: 25) |
+| `save` | object | No | Save options with `format` ("csv" or "json") and optional `filename` |
+
+### Response Data
+
+Returns a DataFrame with:
+
+- **Period** - Fiscal period
+- **Current Estimate** - Latest consensus estimate
+- **7 Days Ago** - Estimate from 7 days prior
+- **30 Days Ago** - Estimate from 30 days prior
+- **60 Days Ago** - Estimate from 60 days prior
+- **90 Days Ago** - Estimate from 90 days prior
+
+### Purpose
+
+Use this tool to:
+
+- Identify if estimates are trending up or down
+- Detect momentum in analyst sentiment
+- Spot recent changes in expectations
+- Understand estimate stability
+
+### Example
+
+```typescript
+{
+  "ticker": "META",
+  "response_format": "json"
+}
+```
+
+---
+
+## yf_ticker_eps_revisions
+
+Tracks recent revisions to EPS estimates by analysts.
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `ticker` | string | Yes | Ticker symbol (e.g., "AAPL") |
+| `response_format` | string | No | Output format: "json" (default) or "markdown" |
+| `preview_limit` | number | No | Max rows to preview (1-200, default: 25) |
+| `save` | object | No | Save options with `format` ("csv" or "json") and optional `filename` |
+
+### Response Data
+
+Returns a DataFrame showing:
+
+- **Period** - Fiscal period
+- **Up Last 7 Days** - Number of upward revisions in past week
+- **Up Last 30 Days** - Number of upward revisions in past month
+- **Down Last 7 Days** - Number of downward revisions in past week
+- **Down Last 30 Days** - Number of downward revisions in past month
+
+### Purpose
+
+Use this tool to:
+
+- Monitor the direction of analyst sentiment
+- Identify if more analysts are raising or lowering estimates
+- Gauge near-term estimate momentum
+- Assess conviction levels in estimates
+
+### Example
+
+```typescript
+{
+  "ticker": "NVDA",
+  "response_format": "markdown"
+}
+```
+
+---
+
+## yf_ticker_growth_estimates
+
+Provides long-term growth estimates and projections.
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `ticker` | string | Yes | Ticker symbol (e.g., "AAPL") |
+| `response_format` | string | No | Output format: "json" (default) or "markdown" |
+| `preview_limit` | number | No | Max rows to preview (1-200, default: 25) |
+| `save` | object | No | Save options with `format` ("csv" or "json") and optional `filename` |
+
+### Response Data
+
+Returns growth projections including:
+
+- **Current Qtr** - Current quarter growth estimate
+- **Next Qtr** - Next quarter growth estimate
+- **Current Year** - Current fiscal year growth estimate
+- **Next Year** - Next fiscal year growth estimate
+- **Next 5 Years (per annum)** - Long-term annual growth rate
+- **Past 5 Years (per annum)** - Historical growth rate
+
+May also include industry and sector comparisons.
+
+### Purpose
+
+Use this tool to:
+
+- Understand expected long-term growth trajectory
+- Compare company growth to historical performance
+- Benchmark against industry/sector growth rates
+- Assess valuation in context of growth expectations
+
+### Example
+
+```typescript
+{
+  "ticker": "GOOGL",
+  "response_format": "json"
+}
+```
+
+---
+
+## Comparing Estimate Tools
+
+| Tool | Focus | Time Horizon | Best For |
+|------|-------|--------------|----------|
+| **earnings_estimate** | Earnings consensus | Quarterly/Annual | Forward earnings expectations |
+| **revenue_estimate** | Revenue consensus | Quarterly/Annual | Top-line growth expectations |
+| **earnings_history** | Past performance | Historical | Estimate accuracy tracking |
+| **eps_trend** | Estimate changes | 7-90 days | Short-term sentiment shifts |
+| **eps_revisions** | Revision counts | 7-30 days | Analyst conviction changes |
+| **growth_estimates** | Long-term growth | Multi-year | Strategic valuation |
+
+## Common Workflows
+
+### Pre-Earnings Analysis
+
+Before an earnings report, use:
+
+1. `yf_ticker_earnings_estimate` - Get the consensus expectation
+2. `yf_ticker_earnings_history` - Check historical beat/miss pattern
+3. `yf_ticker_eps_trend` - See if estimates have been rising or falling
+
+### Valuation Assessment
+
+For forward-looking valuation:
+
+1. `yf_ticker_earnings_estimate` - Get forward earnings
+2. `yf_ticker_growth_estimates` - Understand growth expectations
+3. `yf_ticker_revenue_estimate` - Verify top-line support for earnings
+
+### Sentiment Monitoring
+
+Track analyst sentiment changes:
+
+1. `yf_ticker_eps_revisions` - Check revision direction
+2. `yf_ticker_eps_trend` - Quantify estimate changes
+3. Combine with [yf_ticker_upgrades_downgrades](/tools/analysts/upgrades-downgrades)
+
+## Notes
+
+- Estimate availability varies by ticker and analyst coverage
+- Estimates are typically more detailed for large-cap stocks
+- Numbers are usually in per-share terms (EPS) or millions/billions (revenue)
+- Estimates update regularly as analysts publish new research
+- Not all companies have full coverage across all estimate categories
+
+## Related Tools
+
+- [yf_ticker_analyst_price_targets](/tools/analysts/price-targets) - Price target data
+- [yf_ticker_recommendations](/tools/analysts/recommendations) - Buy/sell/hold ratings
+- [yf_ticker_earnings](/tools/financials/earnings) - Actual earnings data

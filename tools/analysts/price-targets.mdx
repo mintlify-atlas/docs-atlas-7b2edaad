@@ -1,0 +1,127 @@
+---
+title: Analyst Price Targets
+description: Access analyst price target data and projections
+---
+
+## Overview
+
+The `yf_ticker_analyst_price_targets` tool provides analyst consensus price targets and projections for a given ticker.
+
+## yf_ticker_analyst_price_targets
+
+Retrieves analyst price target estimates including current price, target prices, and recommendation distributions.
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `ticker` | string | Yes | Ticker symbol (e.g., "AAPL") |
+| `response_format` | string | No | Output format: "json" (default) or "markdown" |
+| `preview_limit` | number | No | Max rows to preview (1-200, default: 25) |
+| `save` | object | No | Save options with `format` ("csv" or "json") and optional `filename` |
+
+### Response Data
+
+Returns a dictionary containing:
+
+- **current** - Current stock price
+- **low** - Lowest analyst price target
+- **high** - Highest analyst price target
+- **mean** - Mean (average) price target
+- **median** - Median price target
+- **numberOfAnalystOpinions** - Total number of analysts providing targets
+- **recommendation** - Aggregated recommendation rating
+
+Additional fields may include:
+
+- **recommendationKey** - Standardized recommendation category
+- **recommendationMean** - Numerical recommendation score
+
+### Example
+
+```typescript
+{
+  "ticker": "AAPL",
+  "response_format": "json"
+}
+```
+
+### Sample Response
+
+```json
+{
+  "data": {
+    "current": 178.50,
+    "low": 150.00,
+    "high": 220.00,
+    "mean": 195.75,
+    "median": 195.00,
+    "numberOfAnalystOpinions": 42,
+    "recommendation": "BUY",
+    "recommendationKey": "buy",
+    "recommendationMean": 1.95
+  }
+}
+```
+
+## Interpreting Price Targets
+
+### Upside/Downside Potential
+
+Compare the mean or median price target to the current price to assess potential:
+
+- **Mean > Current**: Analysts expect upside
+- **Mean < Current**: Analysts expect downside
+- **% Difference**: `((mean - current) / current) * 100`
+
+### Target Range Analysis
+
+The spread between `low` and `high` indicates analyst disagreement:
+
+- **Narrow range**: Higher consensus
+- **Wide range**: More uncertainty or divergent views
+
+### Recommendation Scale
+
+`recommendationMean` typically uses a 1-5 scale:
+
+- **1.0-1.5**: Strong Buy
+- **1.5-2.5**: Buy
+- **2.5-3.5**: Hold
+- **3.5-4.5**: Sell
+- **4.5-5.0**: Strong Sell
+
+## Common Use Cases
+
+### Valuation Assessment
+
+Determine if a stock is trading above or below analyst expectations:
+
+```typescript
+{
+  "ticker": "GOOGL",
+  "response_format": "json"
+}
+```
+
+### Comparative Analysis
+
+Compare price targets across multiple stocks in a sector by calling the tool multiple times and analyzing the upside potential.
+
+### Tracking Target Changes
+
+Regularly poll this endpoint to monitor how analyst targets evolve over time (combine with historical data for trend analysis).
+
+## Notes
+
+- Price targets reflect analyst opinions and are not guarantees
+- Targets are typically set for 12-month horizons
+- The number of analysts covering a ticker varies significantly
+- Price targets may become stale if not recently updated
+- This data represents consensus views and may not reflect individual analyst reports
+
+## Related Tools
+
+- [yf_ticker_recommendations](/tools/analysts/recommendations) - Detailed recommendation history
+- [yf_ticker_recommendations_summary](/tools/analysts/recommendations) - Recommendation counts
+- [yf_ticker_upgrades_downgrades](/tools/analysts/upgrades-downgrades) - Rating changes

@@ -1,0 +1,128 @@
+---
+title: Installation
+description: Install FinMCP and its dependencies to start accessing financial market data
+---
+
+## Prerequisites
+
+Before installing FinMCP, ensure you have:
+
+- **Node.js** (v18 or higher recommended)
+- **Python 3.10+** installed and available in your PATH
+- **npm** or **npx** for package management
+
+<Note>
+  FinMCP requires Python because it uses the `yfinance` library to fetch financial data. The Node.js component serves as the MCP server wrapper.
+</Note>
+
+## Installation Steps
+
+<Steps>
+  <Step title="Install FinMCP via npm">
+    You can install FinMCP globally or run it on-demand with npx:
+
+    <CodeGroup>
+      ```bash Global Installation
+      npm install -g finmcp
+      ```
+
+      ```bash Run with npx (Recommended)
+      npx -y finmcp
+      ```
+    </CodeGroup>
+
+    <Info>
+      Using `npx -y finmcp` is recommended as it always runs the latest version without requiring a global installation.
+    </Info>
+  </Step>
+
+  <Step title="Install Python Dependencies">
+    FinMCP requires the `yfinance` Python package to fetch financial data:
+
+    ```bash
+    pip install yfinance
+    ```
+
+    <Tip>
+      If you cloned the FinMCP repository, you can install dependencies from the requirements file:
+      ```bash
+      pip install -r python/requirements.txt
+      ```
+    </Tip>
+  </Step>
+
+  <Step title="Verify Installation">
+    Test that FinMCP is properly installed by checking the Python environment:
+
+    ```bash
+    python3 -c "import yfinance; print('yfinance installed successfully')"
+    ```
+
+    You should see:
+    ```
+    yfinance installed successfully
+    ```
+  </Step>
+</Steps>
+
+## Platform-Specific Notes
+
+<AccordionGroup>
+  <Accordion title="Windows">
+    On Windows, FinMCP uses the `python` command instead of `python3`. Ensure Python is added to your PATH during installation.
+
+    ```powershell
+    # Verify Python is available
+    python --version
+
+    # Install yfinance
+    pip install yfinance
+    ```
+  </Accordion>
+
+  <Accordion title="macOS/Linux">
+    On macOS and Linux, FinMCP uses `python3`. Most systems have Python 3 pre-installed, but you may need to install pip:
+
+    ```bash
+    # macOS (using Homebrew)
+    brew install python3
+
+    # Ubuntu/Debian
+    sudo apt install python3 python3-pip
+
+    # Install yfinance
+    pip3 install yfinance
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+<Warning>
+  If you see an error like "Missing Python dependencies for yfinance bridge", ensure:
+  1. Python 3.10+ is installed and in your PATH
+  2. The `yfinance` package is installed via pip
+  3. The Python executable is accessible as `python3` (macOS/Linux) or `python` (Windows)
+</Warning>
+
+### Common Issues
+
+**"python3: command not found"**
+- Install Python 3.10+ for your platform
+- On Windows, use `python` instead of `python3`
+
+**"No module named 'yfinance'"**
+- Run `pip install yfinance` or `pip3 install yfinance`
+- Ensure you're using the correct pip associated with your Python 3 installation
+
+**Permission errors during npm install**
+- Use `sudo` on macOS/Linux: `sudo npm install -g finmcp`
+- Or use npx to avoid global installation: `npx -y finmcp`
+
+## Next Steps
+
+Now that FinMCP is installed, proceed to the Quick Start guide to add it to your AI assistant:
+
+<Card title="Quick Start" icon="rocket" href="/quickstart">
+  Configure FinMCP with Claude or OpenCode and run your first query
+</Card>

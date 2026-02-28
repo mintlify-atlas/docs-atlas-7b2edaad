@@ -1,0 +1,168 @@
+---
+title: 'Field Categories'
+description: 'List field category groups for organizing yfinance data'
+---
+
+## Overview
+
+The `yf_field_categories` tool returns a categorized grouping of yfinance fields, organizing them by data type and use case. This helps you understand field relationships and build more organized queries.
+
+## Use Cases
+
+- **Discover field groups**: Browse fields organized by category (valuation, fundamentals, etc.)
+- **Query organization**: Build screener queries using related field groups
+- **Data exploration**: Understand what types of data are available
+- **Learning**: Discover new fields within categories you're already using
+
+## Parameters
+
+This tool accepts only output formatting parameters:
+
+<ParamField path="response_format" type="string" default="json">
+  Output format: `"json"` or `"markdown"`
+</ParamField>
+
+<ParamField path="preview_limit" type="number" default="25">
+  Number of rows to preview in markdown format (1-200)
+</ParamField>
+
+<ParamField path="save" type="object">
+  Save results to a file
+  
+  <Expandable title="properties">
+    <ParamField path="format" type="string" required>
+      File format: `"csv"` or `"json"`
+    </ParamField>
+    
+    <ParamField path="filename" type="string">
+      Output filename (defaults to auto-generated name)
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Response
+
+Returns field categories with:
+
+- **Category name**: The grouping name (e.g., "Valuation", "Fundamentals", "Performance")
+- **Fields**: List of fields in each category
+- **Description**: What type of data the category represents
+
+## Common Categories
+
+Expect categories such as:
+
+- **Valuation Metrics**: P/E, P/B, market cap, enterprise value
+- **Fundamentals**: Revenue, earnings, profit margins
+- **Performance**: Returns, volatility, beta
+- **Dividends**: Yield, payout ratio, dividend history
+- **Growth**: Revenue growth, earnings growth
+- **Analyst Data**: Recommendations, price targets, estimates
+
+## Example Usage
+
+### Get All Categories
+
+```json
+{
+  "response_format": "json"
+}
+```
+
+### Save Category Reference
+
+```json
+{
+  "response_format": "json",
+  "save": {
+    "format": "json",
+    "filename": "field-categories.json"
+  }
+}
+```
+
+### Preview in Markdown
+
+```json
+{
+  "response_format": "markdown",
+  "preview_limit": 100
+}
+```
+
+## Response Example
+
+```json
+{
+  "data": {
+    "Valuation": {
+      "description": "Valuation metrics and ratios",
+      "fields": [
+        "marketCap",
+        "enterpriseValue",
+        "trailingPE",
+        "forwardPE",
+        "priceToBook",
+        "priceToSales",
+        "pegRatio"
+      ]
+    },
+    "Fundamentals": {
+      "description": "Core financial metrics",
+      "fields": [
+        "totalRevenue",
+        "netIncome",
+        "ebitda",
+        "profitMargins",
+        "operatingMargins",
+        "returnOnEquity",
+        "returnOnAssets"
+      ]
+    },
+    "Dividends": {
+      "description": "Dividend-related metrics",
+      "fields": [
+        "dividendYield",
+        "payoutRatio",
+        "dividendRate",
+        "exDividendDate",
+        "fiveYearAvgDividendYield"
+      ]
+    }
+  },
+  "saved_path": null
+}
+```
+
+## Related Tools
+
+- [Field Definitions](/tools/reference/field-definitions) - Get detailed field definitions and modules
+- [Screener](/tools/screening/screener) - Build queries using categorized fields
+
+## Building Queries with Categories
+
+Use category information to build comprehensive screener queries:
+
+```json
+{
+  "query": {
+    "operator": "and",
+    "operands": [
+      {"operator": "gt", "operands": ["marketCap", 10000000000]},
+      {"operator": "gt", "operands": ["dividendYield", 0.02]},
+      {"operator": "lt", "operands": ["trailingPE", 20]}
+    ]
+  },
+  "query_type": "equity"
+}
+```
+
+## Tips
+
+<Tip>
+  Browse categories to discover related fields you might not have considered. For example, if you're looking at valuation metrics, check the category to find all available valuation ratios.
+</Tip>
+
+<Note>
+  Categories are organizational tools. The actual field availability depends on the ticker type and data module you're querying.
+</Note>

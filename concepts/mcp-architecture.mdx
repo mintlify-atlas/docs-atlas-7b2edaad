@@ -1,0 +1,203 @@
+---
+title: MCP Architecture
+description: Understanding how FinMCP implements the Model Context Protocol
+---
+
+## What is MCP?
+
+The **Model Context Protocol (MCP)** is a standardized protocol that allows AI models to interact with external tools and data sources. MCP servers expose tools that LLMs can discover and invoke to access real-time data, perform computations, or interact with external systems.
+
+FinMCP implements an MCP server that provides financial data tools powered by the yfinance library.
+
+## Architecture Overview
+
+FinMCP uses a **hybrid architecture** combining Node.js and Python:
+
+```
+┌─────────────────────────────────────────┐
+│         MCP Client (AI Model)           │
+└─────────────────┬───────────────────────┘
+                  │ stdio transport
+                  │
+┌─────────────────▼───────────────────────┐
+│      Node.js MCP Server (index.ts)      │
+│  - Tool registration & routing          │
+│  - Response formatting (JSON/Markdown)  │
+│  - Data export (CSV/JSON)               │
+└─────────────────┬───────────────────────┘
+                  │ spawn process
+                  │
+┌─────────────────▼───────────────────────┐
+│     Python Bridge (yf_bridge.py)        │
+│  - yfinance library integration         │
+│  - DataFrame/Series serialization       │
+│  - Data fetching & processing           │
+└─────────────────────────────────────────┘
+```
+
+### Why This Architecture?
+
+1. **Node.js Layer**: Handles MCP protocol communication via stdio transport, leveraging the official `@modelcontextprotocol/sdk` package
+2. **Python Layer**: Accesses yfinance library (Python-only) for Yahoo Finance data retrieval
+3. **Bridge Communication**: JSON-based IPC between Node.js and Python processes
+
+## MCP Server Implementation
+
+The MCP server is initialized in `src/index.ts`:
+
+```typescript
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+
+const server = new McpServer({
+  name: "finmcp",
+  version: "0.1.0",
+});
+
+// ... register tools ...
+
+const transport = new StdioServerTransport();
+await server.connect(transport);
+```
+
+### Tool Registration
+
+Tools are registered using a helper function that wraps the MCP SDK's `registerTool` method:
+
+```typescript
+function registerYfTool<TSchema extends z.ZodTypeAny>(
+  server: McpServer,
+  name: string,
+  description: string,
+  schema: TSchema,
+  action: string,
+) {
+  (server as any).registerTool(
+    name,
+    {
+      description,
+      inputSchema: schema,
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: true,
+      },
+    },
+    async (params: z.infer<TSchema>, _extra: unknown) => {
+      // Tool handler implementation
+    },
+  );
+}
+```
+
+Each tool is registered with:
+- **name**: Unique identifier (e.g., `yf_ticker_history`)
+- **description**: Human-readable description
+- **inputSchema**: Zod schema defining parameters
+- **annotations**: MCP hints about tool behavior
+- **handler**: Async function that processes requests
+
+### Python Bridge Communication
+
+The Node.js server communicates with Python using `child_process.spawn`:
+
+```typescript
+async function callBridge<T>(action: string, args: Record<string, unknown>): Promise<T> {
+  const payload = JSON.stringify({ action, args });
+
+  return new Promise<T>((resolve, reject) => {
+    const proc = spawn(pythonCommand(), [PYTHON_BRIDGE], {
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+
+    let stdout = "";
+    let stderr = "";
+
+    proc.stdout.on("data", (chunk) => {
+      stdout += chunk.toString();
+    });
+
+    proc.on("close", (code) => {
+      if (code !== 0) {
+        reject(new Error(`Python bridge failed (${code}): ${stderr.trim()}`));
+        return;
+      }
+      const parsed = JSON.parse(stdout);
+      if (!parsed.ok) {
+        reject(new Error(parsed.error || "Unknown error from bridge"));
+        return;
+      }
+      resolve(parsed.result as T);
+    });
+
+    proc.stdin.write(payload);
+    proc.stdin.end();
+  });
+}
+```
+
+## Python Bridge Implementation
+
+The Python bridge (`python/yf_bridge.py`) receives actions and returns serialized results:
+
+```python
+def main() -> None:
+    payload = _read_payload()
+    action = payload.get("action")
+    args = payload.get("args", {})
+
+    try:
+        result = _dispatch(action, args)
+        _ok(result)  # Serialize and return result
+    except Exception as exc:
+        _err(str(exc), traceback.format_exc())
+```
+
+### Data Serialization
+
+Pandas DataFrames and Series are serialized to JSON-compatible structures:
+
+```python
+def _serialize_value(value: Any) -> Any:
+    if isinstance(value, pd.DataFrame):
+        df = value.copy()
+        df = df.where(pd.notnull(df), None)
+        return {
+            "__type__": "dataframe",
+            "columns": [str(c) for c in df.columns],
+            "index": [_to_iso(i) for i in df.index.tolist()],
+            "data": [[_serialize_value(v) for v in row] for row in df.to_numpy().tolist()],
+        }
+    if isinstance(value, pd.Series):
+        series = value.where(pd.notnull(value), None)
+        return {
+            "__type__": "series",
+            "name": str(series.name) if series.name is not None else None,
+            "index": [_to_iso(i) for i in series.index.tolist()],
+            "data": [_serialize_value(v) for v in series.tolist()],
+        }
+```
+
+This serialization format preserves:
+- Column names and index values
+- Data types (numbers, strings, dates)
+- Structure (rows and columns)
+- Null values (converted to `None`/`null`)
+
+<Note>
+The `__type__` field allows the Node.js layer to identify DataFrames and Series for proper formatting and export.
+</Note>
+
+## Tool Invocation Flow
+
+1. **AI Model** sends tool call request via MCP protocol
+2. **MCP Server** validates parameters against Zod schema
+3. **Node.js Handler** extracts output options and forwards data parameters to Python
+4. **Python Bridge** executes yfinance operation and serializes result
+5. **Node.js Handler** formats response (JSON/Markdown) and handles export
+6. **MCP Server** returns formatted response to AI model
+
+<Tip>
+All tools share the same handler pattern, making it easy to add new yfinance operations by simply registering them with appropriate schemas.
+</Tip>

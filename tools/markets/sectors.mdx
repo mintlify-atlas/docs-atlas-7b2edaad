@@ -1,0 +1,136 @@
+---
+title: Sectors
+description: Retrieve comprehensive sector-level market data and analysis
+---
+
+## Overview
+
+The `yf_sector` tool provides detailed information about market sectors including performance metrics, top companies, research reports, and related investment products.
+
+## Tool Name
+
+`yf_sector`
+
+## Parameters
+
+<ParamField path="key" type="string" required>
+  Sector key identifier (e.g., 'technology', 'healthcare', 'financial-services')
+</ParamField>
+
+<ParamField path="field" type="enum">
+  Specific sector field to retrieve. Available fields:
+  - `key` - Sector key identifier
+  - `name` - Sector display name
+  - `symbol` - Sector symbol
+  - `ticker` - Sector ticker representation
+  - `overview` - Comprehensive sector overview and statistics
+  - `top_companies` - List of leading companies in the sector
+  - `research_reports` - Available research reports for the sector
+  - `top_etfs` - Top-performing ETFs tracking the sector
+  - `top_mutual_funds` - Top mutual funds focused on the sector
+  - `industries` - Industries contained within the sector
+</ParamField>
+
+<ParamField path="response_format" type="enum" default="json">
+  Output format:
+  - `json` - Structured JSON data
+  - `markdown` - Formatted markdown tables
+</ParamField>
+
+<ParamField path="preview_limit" type="number" default={25}>
+  Number of rows to preview (1-200) when using markdown format
+</ParamField>
+
+<ParamField path="save" type="object">
+  Save options for exporting data:
+  <Expandable>
+    <ParamField path="format" type="enum" required>
+      Export format: `csv` or `json`
+    </ParamField>
+    <ParamField path="filename" type="string">
+      Custom filename for the saved file
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Common Sector Keys
+
+- `technology` - Technology sector
+- `healthcare` - Healthcare sector
+- `financial-services` - Financial Services
+- `consumer-cyclical` - Consumer Cyclical
+- `consumer-defensive` - Consumer Defensive
+- `industrials` - Industrials sector
+- `energy` - Energy sector
+- `utilities` - Utilities sector
+- `real-estate` - Real Estate
+- `basic-materials` - Basic Materials
+- `communication-services` - Communication Services
+
+## Field Details
+
+### Overview
+Provides comprehensive sector statistics including:
+- Market capitalization
+- Performance metrics (1D, 1W, 1M, 3M, YTD, 1Y)
+- Valuation ratios (P/E, P/B, P/S)
+- Profitability metrics
+
+### Top Companies
+Returns a list of the largest and most significant companies within the sector, including:
+- Company name and ticker
+- Market capitalization
+- Performance data
+
+### Industries
+Lists all industries that compose the sector, useful for drilling down to more granular analysis.
+
+### Investment Products
+`top_etfs` and `top_mutual_funds` provide curated lists of investment vehicles that track sector performance.
+
+## Usage Examples
+
+<CodeGroup>
+
+```json Sector Overview
+{
+  "key": "technology",
+  "field": "overview",
+  "response_format": "json"
+}
+```
+
+```json Top Tech Companies
+{
+  "key": "technology",
+  "field": "top_companies",
+  "response_format": "markdown",
+  "preview_limit": 50
+}
+```
+
+```json Sector Industries
+{
+  "key": "healthcare",
+  "field": "industries"
+}
+```
+
+```json Export Sector ETFs
+{
+  "key": "financial-services",
+  "field": "top_etfs",
+  "save": {
+    "format": "csv",
+    "filename": "financial-sector-etfs.csv"
+  }
+}
+```
+
+</CodeGroup>
+
+## Related Tools
+
+- [Industries](/tools/markets/industries) - Drill down to industry-level data
+- [Market Summary](/tools/markets/market-summary) - Broader market-level data
+- [Screener](/tools/screening/screener) - Screen for companies within sectors

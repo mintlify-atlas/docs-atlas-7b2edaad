@@ -1,0 +1,122 @@
+---
+title: 'yf_ticker_capital_gains'
+description: 'Get capital gains distributions for a ticker'
+---
+
+## Description
+
+Returns the capital gains distribution history for a given ticker symbol. Capital gains distributions are primarily relevant for mutual funds and ETFs, which are required to distribute realized capital gains to shareholders annually.
+
+<Note>
+Capital gains distributions are typically only applicable to **mutual funds** and **ETFs**. Most individual stocks will return empty data for this tool.
+</Note>
+
+## Parameters
+
+<ParamField path="ticker" type="string" required>
+  Ticker symbol (e.g., "VFINX", "SPY", "VTI")
+</ParamField>
+
+<ParamField path="response_format" type="enum" default="json">
+  Output format: `"json"` or `"markdown"`
+</ParamField>
+
+<ParamField path="preview_limit" type="integer" default="25">
+  Number of rows to preview in markdown format (min: 1, max: 200)
+</ParamField>
+
+<ParamField path="save" type="object">
+  Save results to a file
+  
+  <Expandable title="properties">
+    <ParamField path="format" type="enum" required>
+      File format: `"csv"` or `"json"`
+    </ParamField>
+    
+    <ParamField path="filename" type="string">
+      Custom filename (defaults to `yf_ticker_capital_gains-{timestamp}.{ext}`)
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Data Structure
+
+Returns a pandas Series with:
+- **Index**: Distribution dates (datetime)
+- **Values**: Capital gains amount per share (float)
+
+The data represents the capital gains distribution amount paid per share on each distribution date.
+
+## Example
+
+<CodeGroup>
+```json Request
+{
+  "ticker": "VFINX"
+}
+```
+
+```json Response
+{
+  "data": {
+    "__type__": "series",
+    "name": "Capital Gains",
+    "index": [
+      "2015-12-18",
+      "2016-12-16",
+      "2017-12-15",
+      "2021-12-17",
+      "2023-12-15"
+    ],
+    "data": [
+      0.52,
+      0.38,
+      1.23,
+      2.45,
+      0.89
+    ]
+  },
+  "saved_path": null
+}
+```
+</CodeGroup>
+
+## When Are Capital Gains Distributed?
+
+Mutual funds and ETFs distribute capital gains when they:
+
+1. **Sell securities at a profit**: When the fund manager sells holdings that have appreciated
+2. **Required by law**: Funds must distribute at least 98% of realized gains annually
+3. **End of year distributions**: Most distributions occur in December
+4. **Tax implications**: Shareholders owe taxes on distributions even if they reinvest
+
+## Difference from Dividends
+
+| Aspect | Capital Gains | Dividends |
+|--------|--------------|----------|
+| **Source** | Fund sells appreciated securities | Company profits or fund dividend income |
+| **Frequency** | Usually annual (December) | Quarterly or monthly |
+| **Predictability** | Variable, depends on fund activity | More consistent |
+| **Tax treatment** | Long-term or short-term capital gains rates | Qualified or ordinary dividend rates |
+| **Who pays** | Primarily mutual funds and ETFs | Stocks, funds, and ETFs |
+
+## Use Cases
+
+- Calculate total return including capital gains distributions
+- Assess tax efficiency of mutual funds and ETFs
+- Compare distribution patterns across funds
+- Plan tax strategies for taxable accounts
+- Evaluate index funds vs. actively managed funds (index funds typically have lower capital gains distributions)
+
+## Related Tools
+
+- [yf_ticker_dividends](/tools/actions/dividends) - Get dividend history
+- [yf_ticker_splits](/tools/actions/splits) - Get stock split history
+- [yf_ticker_info](/tools/company/info) - Get fund category and management info
+
+## Tax-Efficient Alternatives
+
+For taxable accounts, consider:
+- **ETFs over mutual funds**: ETFs typically have lower capital gains distributions due to their structure
+- **Index funds**: Lower turnover means fewer capital gains
+- **Tax-managed funds**: Specifically designed to minimize distributions

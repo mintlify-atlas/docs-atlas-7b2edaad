@@ -1,0 +1,121 @@
+---
+title: Analyst Recommendations
+description: Retrieve analyst buy/sell/hold recommendations and summaries
+---
+
+## Overview
+
+Yahoo Finance provides two tools for accessing analyst recommendations:
+
+- **`yf_ticker_recommendations`** - Full historical recommendation data
+- **`yf_ticker_recommendations_summary`** - Aggregated summary of current recommendations
+
+## yf_ticker_recommendations
+
+Returns the complete history of analyst recommendations for a ticker, including firm names, grades, and dates.
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `ticker` | string | Yes | Ticker symbol (e.g., "AAPL") |
+| `response_format` | string | No | Output format: "json" (default) or "markdown" |
+| `preview_limit` | number | No | Max rows to preview (1-200, default: 25) |
+| `save` | object | No | Save options with `format` ("csv" or "json") and optional `filename` |
+
+### Response Data
+
+Returns a DataFrame with columns typically including:
+
+- **Firm** - Name of the analyst firm
+- **To Grade** - Current recommendation grade
+- **From Grade** - Previous recommendation grade (if upgraded/downgraded)
+- **Action** - Type of action (init, main, up, down, reit)
+- **Date** - Timestamp of the recommendation
+
+### Example
+
+```typescript
+{
+  "ticker": "TSLA",
+  "response_format": "json"
+}
+```
+
+## yf_ticker_recommendations_summary
+
+Returns an aggregated summary showing the current count of recommendations by category.
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `ticker` | string | Yes | Ticker symbol (e.g., "AAPL") |
+| `response_format` | string | No | Output format: "json" (default) or "markdown" |
+| `preview_limit` | number | No | Max rows to preview (1-200, default: 25) |
+| `save` | object | No | Save options with `format` ("csv" or "json") and optional `filename` |
+
+### Response Data
+
+Returns a DataFrame summarizing recommendation counts across time periods:
+
+- **period** - Time frame (e.g., 0m, -1m, -2m, -3m)
+- **strongBuy** - Count of strong buy recommendations
+- **buy** - Count of buy recommendations
+- **hold** - Count of hold recommendations
+- **sell** - Count of sell recommendations
+- **strongSell** - Count of strong sell recommendations
+
+### Example
+
+```typescript
+{
+  "ticker": "AAPL",
+  "response_format": "markdown"
+}
+```
+
+## Key Differences
+
+| Feature | yf_ticker_recommendations | yf_ticker_recommendations_summary |
+|---------|---------------------------|-----------------------------------|
+| **Data Type** | Individual recommendations | Aggregated counts |
+| **History** | Full historical record | Current snapshot + recent trends |
+| **Firm Names** | Included | Not included |
+| **Use Case** | Track specific analyst changes | Get consensus view |
+| **Data Size** | Larger (all recommendations) | Smaller (summary only) |
+
+## Common Use Cases
+
+### Analyzing Consensus
+
+Use `yf_ticker_recommendations_summary` to quickly understand the current analyst consensus:
+
+```typescript
+{
+  "ticker": "MSFT",
+  "response_format": "markdown"
+}
+```
+
+### Tracking Analyst Changes
+
+Use `yf_ticker_recommendations` to identify which firms recently changed their ratings:
+
+```typescript
+{
+  "ticker": "NVDA",
+  "response_format": "json",
+  "save": {
+    "format": "csv",
+    "filename": "nvda-analyst-changes.csv"
+  }
+}
+```
+
+## Notes
+
+- Recommendation data availability varies by ticker and coverage
+- Some tickers may have limited or no analyst coverage
+- Historical recommendations may span several years for well-covered stocks
+- Grade terminology varies by firm but typically includes: Strong Buy, Buy, Hold, Sell, Strong Sell

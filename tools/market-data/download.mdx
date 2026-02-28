@@ -1,0 +1,157 @@
+---
+title: yf_download
+description: Download market data for multiple tickers
+---
+
+Download historical market data for one or more ticker symbols. This is a high-performance tool that can fetch data for multiple tickers simultaneously.
+
+## Parameters
+
+<ParamField path="tickers" type="string" required>
+  Space-separated ticker symbols (e.g., 'SPY AAPL MSFT'). Must contain at least one ticker.
+</ParamField>
+
+<ParamField path="period" type="string">
+  Time period to download. Valid values include:
+  - `1d`, `5d`, `1mo`, `3mo`, `6mo`, `1y`, `2y`, `5y`, `10y`, `ytd`, `max`
+  
+  Cannot be used with `start` and `end` parameters.
+</ParamField>
+
+<ParamField path="interval" type="string">
+  Data interval/granularity. Valid values include:
+  - `1m`, `2m`, `5m`, `15m`, `30m`, `60m`, `90m`, `1h`, `1d`, `5d`, `1wk`, `1mo`, `3mo`
+  
+  Default is `1d` (daily).
+</ParamField>
+
+<ParamField path="start" type="string">
+  Start date for the download (format: YYYY-MM-DD). Use with `end` instead of `period`.
+</ParamField>
+
+<ParamField path="end" type="string">
+  End date for the download (format: YYYY-MM-DD). Use with `start` instead of `period`.
+</ParamField>
+
+<ParamField path="group_by" type="string">
+  How to group the returned data:
+  - `column` (default): Group by data columns
+  - `ticker`: Group by ticker symbol
+</ParamField>
+
+<ParamField path="auto_adjust" type="boolean">
+  Automatically adjust OHLC data for splits and dividends. Default is `true`.
+</ParamField>
+
+<ParamField path="actions" type="boolean">
+  Include dividend and split events in the data. Default is `false`.
+</ParamField>
+
+<ParamField path="threads" type="boolean">
+  Use multithreading for faster downloads when fetching multiple tickers. Default is `true`.
+</ParamField>
+
+<ParamField path="response_format" type="string">
+  Format of the response:
+  - `json` (default): Return structured JSON data
+  - `markdown`: Return formatted markdown table
+</ParamField>
+
+<ParamField path="preview_limit" type="number">
+  Number of rows to include in markdown preview. Must be between 1 and 200. Default is 25.
+</ParamField>
+
+<ParamField path="save" type="object">
+  Save the result to a file:
+  - `format`: Either `csv` or `json`
+  - `filename` (optional): Custom filename (defaults to `yf_download-{timestamp}.{format}`)
+</ParamField>
+
+## Example Usage
+
+### Download multiple tickers for the last year
+
+```json
+{
+  "tickers": "AAPL MSFT GOOGL",
+  "period": "1y",
+  "interval": "1d"
+}
+```
+
+### Download with custom date range
+
+```json
+{
+  "tickers": "SPY QQQ",
+  "start": "2024-01-01",
+  "end": "2024-12-31",
+  "interval": "1d",
+  "group_by": "ticker"
+}
+```
+
+### Download and save to CSV
+
+```json
+{
+  "tickers": "TSLA NVDA",
+  "period": "6mo",
+  "save": {
+    "format": "csv",
+    "filename": "tech_stocks.csv"
+  }
+}
+```
+
+### Get intraday data with actions
+
+```json
+{
+  "tickers": "AAPL",
+  "period": "5d",
+  "interval": "15m",
+  "actions": true,
+  "auto_adjust": false
+}
+```
+
+## Response Format
+
+### JSON Response (default)
+
+The response contains a `data` field with the market data and an optional `saved_path` if the save parameter was used:
+
+```json
+{
+  "data": {
+    "__type__": "dataframe",
+    "columns": ["Open", "High", "Low", "Close", "Volume"],
+    "index": ["2024-01-01", "2024-01-02", "..."],
+    "data": [
+      [150.0, 152.5, 149.5, 151.0, 50000000],
+      [151.0, 153.0, 150.0, 152.5, 48000000]
+    ]
+  },
+  "saved_path": null
+}
+```
+
+### Markdown Response
+
+When `response_format` is set to `markdown`, returns a formatted table:
+
+```
+index | Open | High | Low | Close | Volume
+--- | --- | --- | --- | --- | ---
+2024-01-01 | 150.0 | 152.5 | 149.5 | 151.0 | 50000000
+2024-01-02 | 151.0 | 153.0 | 150.0 | 152.5 | 48000000
+```
+
+## Notes
+
+- Use `period` for relative time ranges or `start`/`end` for absolute dates, but not both
+- When downloading multiple tickers, the `group_by` parameter controls data organization
+- The `threads` parameter can significantly speed up multi-ticker downloads
+- Intraday intervals (1m, 5m, etc.) have limited historical availability (typically 1-60 days)
+- The `auto_adjust` parameter adjusts prices for corporate actions to maintain continuity

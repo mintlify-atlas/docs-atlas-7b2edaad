@@ -1,0 +1,225 @@
+---
+title: Upgrades & Downgrades
+description: Track analyst rating changes and firm actions
+---
+
+## Overview
+
+The `yf_ticker_upgrades_downgrades` tool provides a detailed history of analyst rating changes, including upgrades, downgrades, initiations, and reiterations.
+
+## yf_ticker_upgrades_downgrades
+
+Retrieves the complete history of analyst rating actions for a ticker.
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `ticker` | string | Yes | Ticker symbol (e.g., "AAPL") |
+| `response_format` | string | No | Output format: "json" (default) or "markdown" |
+| `preview_limit` | number | No | Max rows to preview (1-200, default: 25) |
+| `save` | object | No | Save options with `format` ("csv" or "json") and optional `filename` |
+
+### Response Data
+
+Returns a DataFrame with columns typically including:
+
+- **GradeDate** - Date of the rating action
+- **Firm** - Name of the analyst firm
+- **ToGrade** - New rating assigned
+- **FromGrade** - Previous rating (if applicable)
+- **Action** - Type of action (e.g., "up", "down", "init", "main", "reit")
+
+### Action Types
+
+| Action | Description |
+|--------|-------------|
+| **up** | Upgrade - firm raised its rating |
+| **down** | Downgrade - firm lowered its rating |
+| **init** | Initiated coverage - first rating from this firm |
+| **main** | Maintained - reaffirmed existing rating |
+| **reit** | Reiterated - restated rating without change |
+
+### Example
+
+```typescript
+{
+  "ticker": "TSLA",
+  "response_format": "markdown"
+}
+```
+
+### Sample Response (Markdown)
+
+```markdown
+index | GradeDate | Firm | ToGrade | FromGrade | Action
+--- | --- | --- | --- | --- | ---
+0 | 2024-01-15 | Morgan Stanley | Overweight | Equal-Weight | up
+1 | 2024-01-10 | Goldman Sachs | Buy | | init
+2 | 2023-12-20 | JP Morgan | Neutral | Overweight | down
+3 | 2023-12-15 | Bank of America | Buy | Buy | main
+```
+
+## Understanding Rating Grades
+
+Different firms use different terminology for their ratings. Common rating scales include:
+
+### Five-Tier Scale
+- Strong Buy / Buy / Hold / Sell / Strong Sell
+
+### Three-Tier Scale
+- Buy (or Overweight) / Hold (or Neutral/Equal-Weight) / Sell (or Underweight)
+
+### Firm-Specific Terms
+- **Outperform** ≈ Buy
+- **Market Perform** ≈ Hold
+- **Underperform** ≈ Sell
+- **Overweight** ≈ Buy (relative to benchmark)
+- **Equal-Weight** ≈ Hold
+- **Underweight** ≈ Sell (relative to benchmark)
+
+## Use Cases
+
+### Tracking Recent Activity
+
+Identify which firms have recently changed their stance:
+
+```typescript
+{
+  "ticker": "NVDA",
+  "response_format": "markdown",
+  "preview_limit": 10
+}
+```
+
+Focus on the most recent 10 actions to understand current momentum.
+
+### Analyzing Firm Behavior
+
+Filter historical data to see how specific firms have rated the stock over time:
+
+```typescript
+{
+  "ticker": "AAPL",
+  "response_format": "json",
+  "save": {
+    "format": "csv",
+    "filename": "aapl-rating-history.csv"
+  }
+}
+```
+
+Then analyze the CSV to identify patterns by firm.
+
+### Pre-Earnings Positioning
+
+Check if analysts are positioning ahead of earnings by upgrading/downgrading:
+
+```typescript
+{
+  "ticker": "META",
+  "response_format": "markdown",
+  "preview_limit": 20
+}
+```
+
+Cross-reference dates with earnings announcements.
+
+### Sentiment Shifts
+
+Monitor the ratio of upgrades to downgrades to gauge shifting sentiment:
+
+1. Retrieve full history
+2. Count actions by type
+3. Track whether recent activity is net positive or negative
+
+## Interpreting Rating Changes
+
+### Upgrade Significance
+
+- **Positive signal**: Analyst increased confidence in the stock
+- **May indicate**: Improved fundamentals, raised estimates, or better outlook
+- **Impact**: Often correlates with positive price momentum
+
+### Downgrade Significance
+
+- **Negative signal**: Analyst reduced confidence
+- **May indicate**: Deteriorating fundamentals, lowered estimates, or concerns
+- **Impact**: Often correlates with negative price momentum
+
+### Initiation Coverage
+
+- **New coverage**: Firm begins tracking the stock
+- **Often bullish**: Firms typically initiate with Buy/Overweight ratings
+- **Visibility boost**: Can increase institutional awareness
+
+### Maintained/Reiterated Ratings
+
+- **Confirmation**: Firm reaffirms its view
+- **Context matters**: May be noteworthy if issued after major news or earnings
+- **Less impactful**: Generally has minimal price impact
+
+## Combining with Other Tools
+
+For comprehensive analyst analysis, combine with:
+
+### [yf_ticker_recommendations](/tools/analysts/recommendations)
+
+Get the full historical recommendation data (similar but may have different data structure).
+
+### [yf_ticker_recommendations_summary](/tools/analysts/recommendations)
+
+See aggregated counts of current recommendations.
+
+### [yf_ticker_analyst_price_targets](/tools/analysts/price-targets)
+
+Understand the price targets associated with these ratings.
+
+### [yf_ticker_eps_revisions](/tools/analysts/estimates)
+
+Correlate rating changes with estimate revisions.
+
+## Example Workflow
+
+```typescript
+// Step 1: Get recent upgrades/downgrades
+{
+  "ticker": "MSFT",
+  "response_format": "markdown",
+  "preview_limit": 15
+}
+
+// Step 2: Check if estimate revisions align with rating changes
+{
+  "ticker": "MSFT",
+  "response_format": "markdown"
+} // using yf_ticker_eps_revisions
+
+// Step 3: Review current consensus and price targets
+{
+  "ticker": "MSFT",
+  "response_format": "json"
+} // using yf_ticker_analyst_price_targets
+```
+
+## Notes
+
+- Not all rating changes appear immediately (may have data lag)
+- Some firms issue ratings without prior coverage (FromGrade will be empty)
+- Historical data depth varies by ticker
+- Ratings reflect analyst opinions and should be one input among many
+- Some firms may have proprietary rating scales not immediately comparable
+
+## Best Practices
+
+1. **Look for clusters**: Multiple downgrades in a short period may be more significant than a single change
+2. **Consider the source**: Ratings from top-tier firms often have more market impact
+3. **Check the date**: Recent actions are more relevant than old ratings
+4. **Cross-reference**: Combine with price action, estimates, and other analyst data
+5. **Watch for reversals**: Firms that frequently flip ratings may be less reliable
+
+## Related Tools
+
+- [yf_ticker_recommendations](/tools/analysts/recommendations) - Full recommendation history
+- [yf_ticker_analyst_price_targets](/tools/analysts/price-targets) - Price target data
+- [yf_ticker_eps_revisions](/tools/analysts/estimates) - Estimate revision tracking

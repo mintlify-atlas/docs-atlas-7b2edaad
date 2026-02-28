@@ -1,0 +1,205 @@
+---
+title: 'Ticker News'
+description: 'Get news articles for single or multiple tickers'
+---
+
+FinMCP provides two tools for retrieving news articles related to ticker symbols: `yf_ticker_news` for a single ticker and `yf_tickers_news` for multiple tickers simultaneously.
+
+## Single Ticker News
+
+The `yf_ticker_news` tool retrieves news articles for a specific ticker symbol.
+
+### Parameters
+
+<ParamField path="ticker" type="string" required>
+  Ticker symbol (e.g., "AAPL", "MSFT", "TSLA")
+</ParamField>
+
+<ParamField path="response_format" type="string" default="json">
+  Output format for the response
+  - `json` - Returns structured JSON data
+  - `markdown` - Returns formatted markdown tables
+</ParamField>
+
+<ParamField path="preview_limit" type="number" default="25">
+  Maximum number of rows to display in markdown preview (min: 1, max: 200)
+</ParamField>
+
+<ParamField path="save" type="object">
+  Save the result to a file
+  
+  <Expandable title="properties">
+    <ParamField path="format" type="string" required>
+      File format: `csv` or `json`
+    </ParamField>
+    <ParamField path="filename" type="string">
+      Custom filename (defaults to auto-generated name)
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+### Example Usage
+
+<CodeGroup>
+```json Request
+{
+  "ticker": "AAPL"
+}
+```
+
+```json Response
+{
+  "data": [
+    {
+      "uuid": "a1b2c3d4-5678-90ab-cdef-1234567890ab",
+      "title": "Apple Unveils New iPhone Features",
+      "publisher": "TechCrunch",
+      "link": "https://techcrunch.com/article/...",
+      "providerPublishTime": 1703001600,
+      "type": "STORY",
+      "thumbnail": {
+        "resolutions": [
+          {
+            "url": "https://image.url/thumbnail.jpg",
+            "width": 140,
+            "height": 140
+          }
+        ]
+      },
+      "relatedTickers": ["AAPL"]
+    },
+    {
+      "uuid": "b2c3d4e5-6789-01bc-def1-234567890abc",
+      "title": "Apple Stock Reaches New Heights",
+      "publisher": "Bloomberg",
+      "link": "https://bloomberg.com/article/...",
+      "providerPublishTime": 1702915200,
+      "type": "STORY",
+      "relatedTickers": ["AAPL", "MSFT"]
+    }
+  ],
+  "saved_path": null
+}
+```
+</CodeGroup>
+
+---
+
+## Multiple Tickers News
+
+The `yf_tickers_news` tool retrieves news articles for multiple ticker symbols in a single request.
+
+### Parameters
+
+<ParamField path="tickers" type="string" required>
+  Space-separated list of ticker symbols (e.g., "AAPL MSFT GOOGL")
+</ParamField>
+
+<ParamField path="response_format" type="string" default="json">
+  Output format for the response
+  - `json` - Returns structured JSON data
+  - `markdown` - Returns formatted markdown tables
+</ParamField>
+
+<ParamField path="preview_limit" type="number" default="25">
+  Maximum number of rows to display in markdown preview (min: 1, max: 200)
+</ParamField>
+
+<ParamField path="save" type="object">
+  Save the result to a file
+  
+  <Expandable title="properties">
+    <ParamField path="format" type="string" required>
+      File format: `csv` or `json`
+    </ParamField>
+    <ParamField path="filename" type="string">
+      Custom filename (defaults to auto-generated name)
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+### Example Usage
+
+<CodeGroup>
+```json Request
+{
+  "tickers": "AAPL TSLA NVDA"
+}
+```
+
+```json Response
+{
+  "data": [
+    {
+      "uuid": "xyz789-abcd-1234-efgh-567890",
+      "title": "Tech Giants Lead Market Rally",
+      "publisher": "Reuters",
+      "link": "https://reuters.com/article/...",
+      "providerPublishTime": 1703088000,
+      "type": "STORY",
+      "relatedTickers": ["AAPL", "NVDA", "MSFT"]
+    },
+    {
+      "uuid": "abc123-defg-5678-hijk-901234",
+      "title": "Tesla Announces Production Milestone",
+      "publisher": "CNBC",
+      "link": "https://cnbc.com/article/...",
+      "providerPublishTime": 1703074400,
+      "type": "STORY",
+      "relatedTickers": ["TSLA"]
+    },
+    {
+      "uuid": "def456-ghij-9012-klmn-345678",
+      "title": "NVIDIA Reveals AI Chip Breakthrough",
+      "publisher": "The Verge",
+      "link": "https://theverge.com/article/...",
+      "providerPublishTime": 1703001600,
+      "type": "STORY",
+      "relatedTickers": ["NVDA"]
+    }
+  ],
+  "saved_path": null
+}
+```
+</CodeGroup>
+
+---
+
+## News Data Structure
+
+Both tools return an array of news article objects with the following fields:
+
+- **uuid**: Unique identifier for the article
+- **title**: Article headline
+- **publisher**: News source/publisher name
+- **link**: Full URL to the article
+- **providerPublishTime**: Unix timestamp of publication time
+- **type**: Article type (typically "STORY")
+- **thumbnail**: Image thumbnails with resolutions (when available)
+- **relatedTickers**: Array of ticker symbols mentioned in the article
+
+<Note>
+  News articles may reference multiple tickers in the `relatedTickers` field. When using `yf_tickers_news`, you'll receive all articles related to any of the requested tickers, which may include cross-references to tickers not in your original request.
+</Note>
+
+## Comparison: Single vs Multiple Tickers
+
+| Feature | `yf_ticker_news` | `yf_tickers_news` |
+|---------|-----------------|-------------------|
+| **Input** | Single ticker string | Space-separated tickers |
+| **Use Case** | Focused news for one company | News monitoring across portfolio |
+| **Related News** | Only articles mentioning the ticker | Articles mentioning any requested ticker |
+| **Performance** | Faster for single ticker | Efficient for multiple tickers |
+
+### When to Use Each Tool
+
+**Use `yf_ticker_news` when:**
+- You need news for a specific company
+- You're doing deep research on a single stock
+- You want to minimize response size
+
+**Use `yf_tickers_news` when:**
+- You're monitoring a portfolio of stocks
+- You want to see cross-ticker news coverage
+- You need to compare news sentiment across multiple companies
+- You're tracking sector or industry news

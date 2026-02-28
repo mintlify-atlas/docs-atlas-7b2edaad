@@ -1,0 +1,362 @@
+---
+title: Data Export
+description: Save financial data to CSV or JSON files for offline analysis
+---
+
+## Overview
+
+FinMCP supports exporting data directly to files during tool execution. This feature allows you to:
+
+- Save large datasets without hitting response size limits
+- Persist data for offline analysis in spreadsheets or analytics tools
+- Archive historical data snapshots
+- Process data with external tools
+
+## Save Parameter
+
+Every FinMCP tool accepts an optional `save` parameter defined in `src/index.ts`:
+
+```typescript
+const saveSchema = z
+  .object({
+    format: z.enum(["csv", "json"]),
+    filename: z.string().min(1).optional(),
+  })
+  .optional();
+```
+
+The `save` object has two fields:
+
+<ParamField path="save.format" type="enum" required>
+  Export format: `"csv"` or `"json"`
+  
+  - **csv**: Comma-separated values (for DataFrames, Series, and tabular data)
+  - **json**: Pretty-printed JSON (for all data types)
+</ParamField>
+
+<ParamField path="save.filename" type="string">
+  Custom filename for the export. Defaults to `{toolName}-{timestamp}.{extension}`
+  
+  Must be a relative path within the server's working directory for security.
+</ParamField>
+
+## Export Formats
+
+### CSV Export
+
+CSV export is implemented in the `toCsv` function (`src/index.ts:135`):
+
+```typescript
+function toCsv(result: unknown): string {
+  if (isDataFrame(result)) {
+    const header = ["index", ...result.columns];
+    const rows = result.data.map((row, idx) => [result.index[idx], ...row]);
+    return [header, ...rows].map((row) => row.map(escapeCsvValue).join(",")).join("\n");
+  }
+
+  if (isSeries(result)) {
+    const header = ["index", result.name ?? "value"];
+    const rows = result.data.map((value, idx) => [result.index[idx], value]);
+    return [header, ...rows].map((row) => row.map(escapeCsvValue).join(",")).join("\n");
+  }
+
+  if (Array.isArray(result)) {
+    if (result.length === 0) {
+      return "";
+    }
+    if (typeof result[0] === "object" && result[0] !== null) {
+      const columns = Array.from(new Set(result.flatMap((row) => Object.keys(row as Record<string, unknown>))));
+      const rows = result.map((row) => columns.map((col) => (row as Record<string, unknown>)[col]));
+      return [columns, ...rows].map((row) => row.map(escapeCsvValue).join(",")).join("\n");
+    }
+  }
+
+  throw new Error("CSV export requires tabular data. Try response_format=json or choose a table-producing tool.");
+}
+```
+
+#### CSV Value Escaping
+
+The `escapeCsvValue` function handles special characters:
+
+```typescript
+function escapeCsvValue(value: unknown): string {
+  if (value === null || value === undefined) {
+    return "";
+  }
+  const text = String(value).replace(/\r?\n/g, " ");
+  if (text.includes(",") || text.includes("\"") || text.includes("\n")) {
+    return `"${text.replace(/"/g, "\"\"")}"`;  // Escape quotes and wrap in quotes
+  }
+  return text;
+}
+```
+
+#### Supported Data Types for CSV
+
+- **DataFrames**: Exported with index column + data columns
+- **Series**: Exported with index column + value column
+- **Arrays of objects**: Exported with all unique keys as columns
+
+<Note>
+Non-tabular data (plain objects, nested structures) cannot be exported as CSV. Use JSON format instead.
+</Note>
+
+### JSON Export
+
+JSON export uses the `stringifyJson` function:
+
+```typescript
+function stringifyJson(value: unknown): string {
+  return JSON.stringify(value, null, 2);  // Pretty-printed with 2-space indentation
+}
+```
+
+JSON export supports all data types returned by FinMCP tools:
+- DataFrames and Series (with `__type__` metadata)
+- Objects (info dictionaries, news items)
+- Arrays (news lists, search results)
+- Nested structures
+
+## Save Implementation
+
+The `saveResult` function (`src/index.ts:162`) handles file writing:
+
+```typescript
+async function saveResult(result: unknown, save: NonNullable<OutputOptions["save"]>, toolName: string) {
+  const cwd = process.cwd();
+  const extension = save.format === "csv" ? "csv" : "json";
+  const filename = save.filename ?? `${toolName}-${Date.now()}.${extension}`;
+  const resolved = path.resolve(cwd, filename);
+  
+  // Security: prevent path traversal attacks
+  if (!resolved.startsWith(cwd)) {
+    throw new Error("save.filename must stay within the server working directory.");
+  }
+
+  const content = save.format === "csv" ? toCsv(result) : stringifyJson(result);
+  await fs.writeFile(resolved, content, "utf8");
+  return resolved;
+}
+```
+
+### Security
+
+The function validates that the resolved path stays within the server's working directory to prevent path traversal attacks:
+
+```typescript
+if (!resolved.startsWith(cwd)) {
+  throw new Error("save.filename must stay within the server working directory.");
+}
+```
+
+## Usage Examples
+
+### Export Historical Data to CSV
+
+```typescript
+yf_ticker_history(
+  ticker="AAPL",
+  period="1y",
+  interval="1d",
+  save={
+    format: "csv",
+    filename: "aapl-2024-daily.csv"
+  }
+)
+```
+
+**Output file** (`aapl-2024-daily.csv`):
+```csv
+index,Open,High,Low,Close,Volume,Dividends,Stock Splits
+2024-01-02T00:00:00,185.64,186.42,184.23,185.92,52746300,0,0
+2024-01-03T00:00:00,184.35,185.40,183.92,184.25,47230800,0,0
+...
+```
+
+### Export Company Info to JSON
+
+```typescript
+yf_ticker_info(
+  ticker="MSFT",
+  save={
+    format: "json",
+    filename: "msft-info.json"
+  }
+)
+```
+
+**Output file** (`msft-info.json`):
+```json
+{
+  "symbol": "MSFT",
+  "longName": "Microsoft Corporation",
+  "sector": "Technology",
+  "industry": "Software—Infrastructure",
+  "marketCap": 3100000000000,
+  "previousClose": 420.55,
+  "regularMarketOpen": 421.30
+}
+```
+
+### Default Filename Pattern
+
+If `filename` is omitted, FinMCP generates a timestamped filename:
+
+```typescript
+yf_download(
+  tickers="SPY AAPL MSFT",
+  period="1mo",
+  save={
+    format: "csv"
+    // filename omitted - will generate: yf_download-1709251200000.csv
+  }
+)
+```
+
+Pattern: `{toolName}-{timestamp}.{extension}`
+
+Example: `yf_download-1709251200000.csv`
+
+## Combining Export with Response Formats
+
+You can save data while still receiving a formatted response:
+
+### Save + Markdown Preview
+
+```typescript
+yf_ticker_history(
+  ticker="NVDA",
+  period="1y",
+  response_format="markdown",
+  preview_limit=10,
+  save={
+    format: "csv",
+    filename: "nvda-full-year.csv"
+  }
+)
+```
+
+**Response**:
+```markdown
+index | Open | High | Low | Close | Volume
+--- | --- | --- | --- | --- | ---
+2024-01-02T00:00:00 | 495.22 | 502.50 | 492.10 | 501.45 | 45000000
+... (10 rows)
+
+Saved to /path/to/nvda-full-year.csv
+```
+
+The full year of data is saved to CSV, but only 10 rows are shown in the response.
+
+### Save + JSON Response
+
+```typescript
+yf_search(
+  query="artificial intelligence",
+  max_results=50,
+  save={
+    format: "json",
+    filename: "ai-search-results.json"
+  }
+)
+```
+
+**Response**:
+```json
+{
+  "data": {
+    "quotes": [...],
+    "news": [...],
+    "research": [...]
+  },
+  "saved_path": "/path/to/ai-search-results.json"
+}
+```
+
+<Tip>
+The `saved_path` field in JSON responses shows the absolute path where data was saved.
+</Tip>
+
+## Error Handling
+
+### Invalid CSV Data Type
+
+```typescript
+yf_ticker_info(
+  ticker="AAPL",
+  save={
+    format: "csv"  // ERROR: info returns an object, not tabular data
+  }
+)
+```
+
+**Error**: `CSV export requires tabular data. Try response_format=json or choose a table-producing tool.`
+
+### Path Traversal Attempt
+
+```typescript
+yf_ticker_history(
+  ticker="AAPL",
+  save={
+    format: "csv",
+    filename: "../../etc/passwd"  // Security violation
+  }
+)
+```
+
+**Error**: `save.filename must stay within the server working directory.`
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Use CSV for time series and tabular data">
+    CSV files are widely compatible with Excel, Google Sheets, pandas, and data analysis tools. Ideal for:
+    - Historical price data
+    - Financial statements
+    - Screener results
+    - Earnings calendars
+  </Accordion>
+
+  <Accordion title="Use JSON for structured metadata">
+    JSON preserves nested structures and data types. Best for:
+    - Company info dictionaries
+    - News and research results
+    - Options chains
+    - Search results with mixed content
+  </Accordion>
+
+  <Accordion title="Provide descriptive filenames">
+    Use meaningful names that include:
+    - Ticker symbol(s)
+    - Date range or period
+    - Data type
+    
+    Example: `aapl-2024-q1-financials.json`
+  </Accordion>
+
+  <Accordion title="Combine export with preview_limit">
+    For large datasets:
+    1. Set `save` to persist full data
+    2. Set `response_format="markdown"` for readability
+    3. Set `preview_limit` to a reasonable number (10-50)
+    
+    This avoids overwhelming the chat context while preserving full data.
+  </Accordion>
+</AccordionGroup>
+
+## File Location
+
+Exported files are saved relative to the MCP server's working directory, typically:
+
+- **Claude Desktop (macOS)**: `~/Library/Application Support/Claude/`
+- **Claude Desktop (Windows)**: `%APPDATA%\Claude\`
+- **Custom installations**: The directory where the MCP server was started
+
+The full absolute path is returned in:
+- `saved_path` field (JSON responses)
+- "Saved to {path}" note (Markdown responses)
+
+<Warning>
+Exported files are not automatically cleaned up. Monitor disk usage if exporting large datasets frequently.
+</Warning>

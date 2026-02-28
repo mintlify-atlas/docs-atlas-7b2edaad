@@ -1,0 +1,124 @@
+---
+title: 'Income Statement'
+description: 'Retrieve income statement data for a ticker symbol'
+---
+
+## Overview
+
+The `yf_ticker_income_stmt` tool retrieves income statement (profit and loss) data for a specified ticker symbol. Income statements show a company's revenues, expenses, and profitability over a period of time.
+
+## Parameters
+
+<ParamField path="ticker" type="string" required>
+  Ticker symbol to retrieve income statement for (e.g., "AAPL", "MSFT", "GOOGL")
+</ParamField>
+
+<ParamField path="as_dict" type="boolean" default="false">
+  Return the data as a dictionary instead of a DataFrame format
+</ParamField>
+
+<ParamField path="pretty" type="boolean" default="false">
+  Return human-readable formatted output with better formatting for display
+</ParamField>
+
+<ParamField path="freq" type="string" default="yearly">
+  Frequency of the financial data to retrieve:
+  - `yearly` - Annual income statements
+  - `quarterly` - Quarterly income statements
+  - `trailing` - Trailing twelve months (TTM) data
+</ParamField>
+
+<ParamField path="response_format" type="string" default="json">
+  Format for the response:
+  - `json` - Returns structured JSON data
+  - `markdown` - Returns a formatted markdown table
+</ParamField>
+
+<ParamField path="preview_limit" type="number" default="25">
+  When using `response_format="markdown"`, limits the number of rows displayed (1-200)
+</ParamField>
+
+<ParamField path="save" type="object">
+  Options to save the result to a file:
+  - `format` - Either "csv" or "json"
+  - `filename` - Optional custom filename (defaults to auto-generated)
+</ParamField>
+
+## Data Returned
+
+The income statement typically includes financial metrics such as:
+
+- **Total Revenue** - Total sales and revenue generated
+- **Cost of Revenue** - Direct costs of producing goods/services
+- **Gross Profit** - Revenue minus cost of revenue
+- **Operating Expenses** - Selling, general, and administrative expenses
+- **Operating Income** - Profit from core business operations
+- **Interest Expense** - Cost of borrowed funds
+- **Income Tax Expense** - Taxes owed on income
+- **Net Income** - Bottom line profit after all expenses
+- **Earnings Per Share (EPS)** - Net income divided by shares outstanding
+
+The data is typically returned as a time series with the most recent periods as columns.
+
+## Examples
+
+### Yearly Income Statement
+
+Retrieve annual income statement data:
+
+```json
+{
+  "ticker": "AAPL",
+  "freq": "yearly"
+}
+```
+
+### Quarterly Income Statement
+
+Get quarterly financial results:
+
+```json
+{
+  "ticker": "MSFT",
+  "freq": "quarterly"
+}
+```
+
+### Trailing Twelve Months
+
+Retrieve TTM data for the most current 12-month performance:
+
+```json
+{
+  "ticker": "GOOGL",
+  "freq": "trailing"
+}
+```
+
+### With Markdown Output
+
+Get a formatted markdown table:
+
+```json
+{
+  "ticker": "TSLA",
+  "freq": "quarterly",
+  "response_format": "markdown",
+  "preview_limit": 10
+}
+```
+
+### Save to CSV
+
+Retrieve and save the income statement to a CSV file:
+
+```json
+{
+  "ticker": "NVDA",
+  "freq": "yearly",
+  "save": {
+    "format": "csv",
+    "filename": "nvda_income_statement.csv"
+  }
+}
+```

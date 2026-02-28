@@ -1,122 +1,153 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "FinMCP",
+  "theme": "palm",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#10b981",
+    "light": "#34d399",
+    "dark": "#059669"
   },
-  "favicon": "/favicon.svg",
+  "navbar": {
+    "primary": {
+      "type": "github",
+      "href": "https://github.com/EndlessHoper/finmcp"
+    }
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/EndlessHoper/finmcp"
+    }
+  },
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Documentation",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Getting Started",
             "pages": [
-              "index",
-              "quickstart",
-              "development"
+              "introduction",
+              "installation",
+              "quickstart"
             ]
           },
           {
-            "group": "Customization",
+            "group": "Core Concepts",
             "pages": [
-              "essentials/settings",
-              "essentials/navigation"
+              "concepts/mcp-architecture",
+              "concepts/output-formats",
+              "concepts/data-export"
             ]
           },
           {
-            "group": "Writing content",
+            "group": "Integration Guides",
             "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
+              "integrations/claude",
+              "integrations/opencode",
+              "integrations/custom-clients"
             ]
           },
           {
-            "group": "AI tools",
+            "group": "Examples",
             "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "examples/market-analysis",
+              "examples/company-research",
+              "examples/portfolio-tracking"
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "Tool Reference",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "Overview",
             "pages": [
-              "api-reference/introduction"
+              "tools/overview"
             ]
           },
           {
-            "group": "Endpoint examples",
+            "group": "Market Data",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "tools/market-data/download",
+              "tools/market-data/history",
+              "tools/market-data/tickers-history"
+            ]
+          },
+          {
+            "group": "Company Information",
+            "pages": [
+              "tools/company/info",
+              "tools/company/fast-info",
+              "tools/company/news"
+            ]
+          },
+          {
+            "group": "Financial Statements",
+            "pages": [
+              "tools/financials/income-statement",
+              "tools/financials/balance-sheet",
+              "tools/financials/cash-flow",
+              "tools/financials/earnings"
+            ]
+          },
+          {
+            "group": "Corporate Actions",
+            "pages": [
+              "tools/actions/dividends",
+              "tools/actions/splits",
+              "tools/actions/capital-gains"
+            ]
+          },
+          {
+            "group": "Analyst Data",
+            "pages": [
+              "tools/analysts/recommendations",
+              "tools/analysts/price-targets",
+              "tools/analysts/estimates",
+              "tools/analysts/upgrades-downgrades"
+            ]
+          },
+          {
+            "group": "Ownership & Holdings",
+            "pages": [
+              "tools/ownership/major-holders",
+              "tools/ownership/institutional",
+              "tools/ownership/insider-transactions"
+            ]
+          },
+          {
+            "group": "Options",
+            "pages": [
+              "tools/options/options-chain"
+            ]
+          },
+          {
+            "group": "Screening & Discovery",
+            "pages": [
+              "tools/screening/search",
+              "tools/screening/lookup",
+              "tools/screening/screener",
+              "tools/screening/calendars"
+            ]
+          },
+          {
+            "group": "Markets & Sectors",
+            "pages": [
+              "tools/markets/market-summary",
+              "tools/markets/sectors",
+              "tools/markets/industries"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "tools/reference/field-definitions",
+              "tools/reference/field-categories"
             ]
           }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
-  },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
-  },
-  "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
-      }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
-    }
-  },
-  "contextual": {
-    "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
-  },
-  "footer": {
-    "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
-    }
+    ]
   }
 }

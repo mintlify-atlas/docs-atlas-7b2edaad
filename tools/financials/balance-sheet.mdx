@@ -1,0 +1,137 @@
+---
+title: 'Balance Sheet'
+description: 'Retrieve balance sheet data for a ticker symbol'
+---
+
+## Overview
+
+The `yf_ticker_balance_sheet` tool retrieves balance sheet data for a specified ticker symbol. Balance sheets provide a snapshot of a company's financial position, showing assets, liabilities, and shareholders' equity at a specific point in time.
+
+## Parameters
+
+<ParamField path="ticker" type="string" required>
+  Ticker symbol to retrieve balance sheet for (e.g., "AAPL", "MSFT", "GOOGL")
+</ParamField>
+
+<ParamField path="as_dict" type="boolean" default="false">
+  Return the data as a dictionary instead of a DataFrame format
+</ParamField>
+
+<ParamField path="pretty" type="boolean" default="false">
+  Return human-readable formatted output with better formatting for display
+</ParamField>
+
+<ParamField path="freq" type="string" default="yearly">
+  Frequency of the financial data to retrieve:
+  - `yearly` - Annual balance sheets
+  - `quarterly` - Quarterly balance sheets
+  - `trailing` - Most recent trailing period data
+</ParamField>
+
+<ParamField path="response_format" type="string" default="json">
+  Format for the response:
+  - `json` - Returns structured JSON data
+  - `markdown` - Returns a formatted markdown table
+</ParamField>
+
+<ParamField path="preview_limit" type="number" default="25">
+  When using `response_format="markdown"`, limits the number of rows displayed (1-200)
+</ParamField>
+
+<ParamField path="save" type="object">
+  Options to save the result to a file:
+  - `format` - Either "csv" or "json"
+  - `filename` - Optional custom filename (defaults to auto-generated)
+</ParamField>
+
+## Data Returned
+
+The balance sheet typically includes:
+
+### Assets
+- **Current Assets** - Cash, accounts receivable, inventory, etc.
+- **Cash and Cash Equivalents** - Liquid assets
+- **Accounts Receivable** - Money owed by customers
+- **Inventory** - Goods available for sale
+- **Property, Plant & Equipment** - Long-term physical assets
+- **Intangible Assets** - Goodwill, patents, trademarks
+- **Total Assets** - Sum of all assets
+
+### Liabilities
+- **Current Liabilities** - Short-term obligations due within one year
+- **Accounts Payable** - Money owed to suppliers
+- **Short-term Debt** - Debt due within one year
+- **Long-term Debt** - Debt due beyond one year
+- **Total Liabilities** - Sum of all liabilities
+
+### Equity
+- **Common Stock** - Par value of issued shares
+- **Retained Earnings** - Accumulated profits reinvested
+- **Treasury Stock** - Company's own shares bought back
+- **Total Stockholders' Equity** - Assets minus liabilities
+
+The balance sheet follows the accounting equation: **Assets = Liabilities + Equity**
+
+## Examples
+
+### Yearly Balance Sheet
+
+Retrieve annual balance sheet data:
+
+```json
+{
+  "ticker": "AAPL",
+  "freq": "yearly"
+}
+```
+
+### Quarterly Balance Sheet
+
+Get quarterly snapshots of financial position:
+
+```json
+{
+  "ticker": "JPM",
+  "freq": "quarterly"
+}
+```
+
+### With Dictionary Format
+
+Retrieve balance sheet as a dictionary:
+
+```json
+{
+  "ticker": "BAC",
+  "freq": "yearly",
+  "as_dict": true
+}
+```
+
+### Pretty Formatted Output
+
+Get human-readable formatted data:
+
+```json
+{
+  "ticker": "WFC",
+  "freq": "quarterly",
+  "pretty": true,
+  "response_format": "markdown"
+}
+```
+
+### Save to JSON
+
+Retrieve and save the balance sheet to a JSON file:
+
+```json
+{
+  "ticker": "GS",
+  "freq": "yearly",
+  "save": {
+    "format": "json",
+    "filename": "goldman_sachs_balance_sheet.json"
+  }
+}
+```

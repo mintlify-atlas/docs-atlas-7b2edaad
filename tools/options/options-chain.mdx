@@ -1,0 +1,113 @@
+---
+title: Options Chain
+description: Retrieve options chain data including calls and puts for a ticker symbol
+---
+
+## yf_ticker_options
+
+Get the complete options chain for a ticker, including both calls and puts contracts for a specified expiration date.
+
+## Parameters
+
+<ParamField path="ticker" type="string" required>
+  Ticker symbol, e.g. AAPL
+</ParamField>
+
+<ParamField path="date" type="string">
+  Options expiration date in YYYY-MM-DD format. If not specified, returns data for the nearest expiration date.
+</ParamField>
+
+<ParamField path="tz" type="string">
+  Timezone for date interpretation (e.g. "America/New_York", "UTC"). Defaults to the exchange's timezone.
+</ParamField>
+
+<ParamField path="response_format" type="string" default="json">
+  Output format: "json" or "markdown"
+</ParamField>
+
+<ParamField path="preview_limit" type="number" default={25}>
+  Number of rows to preview when using markdown format (min: 1, max: 200)
+</ParamField>
+
+<ParamField path="save" type="object">
+  Save options for exporting data to a file
+  
+  <Expandable title="properties">
+    <ParamField path="format" type="string" required>
+      Export format: "csv" or "json"
+    </ParamField>
+    
+    <ParamField path="filename" type="string">
+      Custom filename for the exported file. If not specified, generates a timestamped filename.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Example Usage
+
+```json
+{
+  "ticker": "AAPL",
+  "date": "2024-12-20"
+}
+```
+
+## Data Structure
+
+The tool returns an options chain containing two main components:
+
+- **calls**: Array of call option contracts
+- **puts**: Array of put option contracts
+
+Each contract includes:
+- Strike price
+- Last traded price
+- Bid and ask prices
+- Volume
+- Open interest
+- Implied volatility
+- Contract symbol
+- Last trade date
+- Additional option metrics
+
+## Response Example
+
+```json
+{
+  "data": {
+    "calls": [
+      {
+        "contractSymbol": "AAPL241220C00100000",
+        "strike": 100.0,
+        "lastPrice": 85.25,
+        "bid": 85.00,
+        "ask": 85.50,
+        "volume": 1250,
+        "openInterest": 5420,
+        "impliedVolatility": 0.2534
+      }
+    ],
+    "puts": [
+      {
+        "contractSymbol": "AAPL241220P00100000",
+        "strike": 100.0,
+        "lastPrice": 0.15,
+        "bid": 0.12,
+        "ask": 0.18,
+        "volume": 850,
+        "openInterest": 3210,
+        "impliedVolatility": 0.1823
+      }
+    ]
+  },
+  "saved_path": null
+}
+```
+
+## Use Cases
+
+- Analyze available strike prices and expiration dates
+- Compare call and put option premiums
+- Evaluate implied volatility across strikes
+- Identify high-volume or high-interest contracts
+- Build options trading strategies

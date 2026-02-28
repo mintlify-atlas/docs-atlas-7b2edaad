@@ -1,0 +1,276 @@
+---
+title: Tool Reference
+description: Complete reference for all 50+ FinMCP tools
+---
+
+FinMCP provides over 50 tools for accessing market data, company information, financial statements, and more through the yfinance library. All tools support common output parameters for flexible data formatting and export.
+
+## Common Parameters
+
+All tools support these optional output parameters:
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `response_format` | `"json"` \| `"markdown"` | Output format (default: `"json"`) |
+| `preview_limit` | number | Number of rows to show in markdown tables (default: 25, max: 200) |
+| `save` | object | Save data to file with `format` (`"csv"` \| `"json"`) and optional `filename` |
+
+**Example with output options:**
+```json
+{
+  "ticker": "AAPL",
+  "response_format": "markdown",
+  "preview_limit": 50,
+  "save": {
+    "format": "csv",
+    "filename": "aapl_data.csv"
+  }
+}
+```
+
+## Tools by Category
+
+<CardGroup cols={2}>
+  <Card title="Market Data" icon="chart-line" href="#market-data">
+    Download historical prices and data for single or multiple tickers
+  </Card>
+  <Card title="Company Information" icon="building" href="#company-information">
+    Company profiles, fast info, and news feeds
+  </Card>
+  <Card title="Financial Statements" icon="file-invoice-dollar" href="#financial-statements">
+    Income statements, balance sheets, and cash flow data
+  </Card>
+  <Card title="Corporate Actions" icon="arrows-split-up-and-left" href="#corporate-actions">
+    Dividends, stock splits, and capital gains
+  </Card>
+  <Card title="Analyst Data" icon="chart-mixed" href="#analyst-data">
+    Recommendations, price targets, and earnings estimates
+  </Card>
+  <Card title="Ownership" icon="users" href="#ownership">
+    Institutional holders, insiders, and mutual fund ownership
+  </Card>
+  <Card title="Options" icon="chart-candlestick" href="#options">
+    Options chains and expiration dates
+  </Card>
+  <Card title="Screening" icon="magnifying-glass-chart" href="#screening">
+    Search, lookup, screen, and calendar tools
+  </Card>
+  <Card title="Markets & Sectors" icon="globe" href="#markets--sectors">
+    Market summaries, sector performance, and industry data
+  </Card>
+  <Card title="Reference" icon="book" href="#reference">
+    Field definitions and data schema documentation
+  </Card>
+</CardGroup>
+
+---
+
+## Market Data
+
+Tools for downloading and accessing historical market data.
+
+| Tool | Description |
+|------|-------------|
+| `yf_download` | Download market data for multiple tickers with various intervals and periods |
+| `yf_ticker_history` | Get historical market data for a single ticker with OHLCV data |
+| `yf_tickers_history` | Get historical market data for multiple tickers with grouping options |
+
+**Key Parameters:**
+- `period`: `1d`, `5d`, `1mo`, `3mo`, `6mo`, `1y`, `2y`, `5y`, `10y`, `ytd`, `max`
+- `interval`: `1m`, `2m`, `5m`, `15m`, `30m`, `60m`, `90m`, `1h`, `1d`, `5d`, `1wk`, `1mo`, `3mo`
+- `start`/`end`: Date strings for custom ranges
+- `auto_adjust`: Apply dividend/split adjustments
+- `actions`: Include dividends and splits in data
+
+---
+
+## Company Information
+
+Basic company data and news feeds.
+
+| Tool | Description |
+|------|-------------|
+| `yf_ticker_info` | Complete info dictionary with company details, financials, and metrics |
+| `yf_ticker_fast_info` | Lightweight info for quick access to key metrics |
+| `yf_ticker_news` | News articles for a single ticker |
+| `yf_tickers_news` | News articles for multiple tickers |
+
+**Info includes:** sector, industry, market cap, employee count, description, contact info, key executives, and more.
+
+---
+
+## Financial Statements
+
+Complete financial statement data with multiple frequency options.
+
+| Tool | Description |
+|------|-------------|
+| `yf_ticker_income_stmt` | Income statement data (revenue, expenses, net income) |
+| `yf_ticker_balance_sheet` | Balance sheet data (assets, liabilities, equity) |
+| `yf_ticker_cash_flow` | Cash flow statement (operating, investing, financing activities) |
+| `yf_ticker_earnings` | Earnings data including quarterly and annual results |
+| `yf_ticker_calendar` | Upcoming calendar events (earnings dates, ex-dividend dates) |
+| `yf_ticker_earnings_dates` | Historical and upcoming earnings announcement dates |
+
+**Key Parameters:**
+- `freq`: `"yearly"`, `"quarterly"`, or `"trailing"` (TTM)
+- `as_dict`: Return as dictionary instead of DataFrame
+- `pretty`: Human-readable formatting
+
+---
+
+## Corporate Actions
+
+Historical corporate action events.
+
+| Tool | Description |
+|------|-------------|
+| `yf_ticker_actions` | All corporate actions (dividends and splits combined) |
+| `yf_ticker_dividends` | Dividend payment history |
+| `yf_ticker_splits` | Stock split history |
+| `yf_ticker_capital_gains` | Capital gains distributions (mutual funds/ETFs) |
+
+---
+
+## Analyst Data
+
+Analyst recommendations, price targets, and earnings estimates.
+
+| Tool | Description |
+|------|-------------|
+| `yf_ticker_recommendations` | Detailed analyst recommendations over time |
+| `yf_ticker_recommendations_summary` | Summary of current recommendation consensus |
+| `yf_ticker_upgrades_downgrades` | Recent analyst upgrades and downgrades |
+| `yf_ticker_analyst_price_targets` | Analyst price target data |
+| `yf_ticker_earnings_estimate` | Earnings estimates by analysts |
+| `yf_ticker_revenue_estimate` | Revenue estimates by analysts |
+| `yf_ticker_earnings_history` | Historical earnings vs. estimates |
+| `yf_ticker_eps_trend` | EPS trend analysis |
+| `yf_ticker_eps_revisions` | EPS estimate revisions |
+| `yf_ticker_growth_estimates` | Growth rate estimates |
+
+---
+
+## Ownership
+
+Shareholder and ownership data.
+
+| Tool | Description |
+|------|-------------|
+| `yf_ticker_major_holders` | Major holder breakdown percentages |
+| `yf_ticker_institutional_holders` | Top institutional shareholders |
+| `yf_ticker_mutualfund_holders` | Top mutual fund holders |
+| `yf_ticker_insider_purchases` | Recent insider purchase transactions |
+| `yf_ticker_insider_transactions` | All insider transaction history |
+| `yf_ticker_insider_roster_holders` | Current insider roster |
+| `yf_ticker_shares` | Outstanding shares data |
+| `yf_ticker_shares_full` | Full historical shares outstanding with date range |
+
+---
+
+## Options
+
+Options chain data and analysis.
+
+| Tool | Description |
+|------|-------------|
+| `yf_ticker_options` | Options chain for calls and puts at a specific expiration date |
+
+**Parameters:**
+- `date`: Expiration date (optional, defaults to nearest expiration)
+- `tz`: Timezone for the data
+
+---
+
+## Screening
+
+Search, discovery, and screening tools.
+
+| Tool | Description |
+|------|-------------|
+| `yf_search` | Search for quotes, news, and research by query string |
+| `yf_lookup` | Lookup ticker symbols and asset types |
+| `yf_screen` | Run equity or fund screener queries with custom filters |
+| `yf_calendars` | Fetch earnings calendars, IPO calendars, splits, and economic events |
+
+**Screener query types:**
+- `equity`: Screen stocks with custom filters
+- `fund`: Screen mutual funds and ETFs
+
+**Calendar types:**
+- `earnings`: Upcoming earnings announcements
+- `ipo`: Upcoming IPO dates
+- `splits`: Upcoming stock splits
+- `economic_events`: Economic calendar events
+
+---
+
+## Markets & Sectors
+
+Market-level, sector, and industry data.
+
+| Tool | Description |
+|------|-------------|
+| `yf_market` | Fetch market summary or trading status for a specific market |
+| `yf_sector` | Sector-level data including overview, top companies, ETFs, and industries |
+| `yf_industry` | Industry-level data including overview, top companies, and performance metrics |
+
+**Market keys:** `EUROPE`, `US`, `ASIA`, etc.
+
+**Sector fields:** `overview`, `top_companies`, `research_reports`, `top_etfs`, `top_mutual_funds`, `industries`
+
+**Industry fields:** `overview`, `top_companies`, `top_performing_companies`, `top_growth_companies`, `sector_key`
+
+---
+
+## Reference
+
+Data schema and field reference documentation.
+
+| Tool | Description |
+|------|-------------|
+| `yf_field_definitions` | Complete list of available fields and valid modules in yfinance |
+| `yf_field_categories` | Field category groups for organizing yfinance data |
+
+Use these tools to discover available fields for company info, financial statements, and other data structures.
+
+---
+
+## Additional Features
+
+### SEC Filings
+
+| Tool | Description |
+|------|-------------|
+| `yf_ticker_sec_filings` | Recent SEC filing documents and links |
+
+### Sustainability
+
+| Tool | Description |
+|------|-------------|
+| `yf_ticker_sustainability` | ESG (Environmental, Social, Governance) scores and sustainability metrics |
+
+### Fund Data
+
+| Tool | Description |
+|------|-------------|
+| `yf_ticker_funds_data` | Detailed fund data for ETFs and mutual funds (holdings, allocations, etc.) |
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Market Data Guide" icon="chart-line" href="/guides/market-data">
+    Learn how to download and work with historical price data
+  </Card>
+  <Card title="Financial Analysis" icon="calculator" href="/guides/financial-analysis">
+    Analyze financial statements and company metrics
+  </Card>
+  <Card title="Screening Stocks" icon="filter" href="/guides/screening">
+    Use screeners and calendars to discover opportunities
+  </Card>
+  <Card title="Options Analysis" icon="chart-candlestick" href="/guides/options">
+    Work with options chains and derivatives data
+  </Card>
+</CardGroup>

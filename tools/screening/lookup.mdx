@@ -1,0 +1,145 @@
+---
+title: Lookup
+description: Look up ticker symbols by asset type
+---
+
+The `yf_lookup` tool provides targeted ticker symbol lookup with filtering by asset type. It's more focused than search and returns only ticker symbols and basic identification information.
+
+## Parameters
+
+<ParamField path="query" type="string" required>
+  Lookup query string. Typically a ticker symbol, partial symbol, or company name.
+</ParamField>
+
+<ParamField path="kind" type="string" default="all">
+  Filter results by asset type.
+  
+  **Options:**
+  - `all` - All asset types
+  - `stock` - Stocks/equities
+  - `mutualfund` - Mutual funds
+  - `etf` - Exchange-traded funds
+  - `index` - Market indices
+  - `future` - Futures contracts
+  - `currency` - Currencies
+  - `cryptocurrency` - Cryptocurrencies
+</ParamField>
+
+<ParamField path="count" type="integer" default={10}>
+  Maximum number of results to return.
+  
+  **Constraints:** Min: 1, Max: 100
+</ParamField>
+
+### Output Options
+
+<ParamField path="response_format" type="string" default="json">
+  Format of the response data.
+  
+  **Options:** `json`, `markdown`
+</ParamField>
+
+<ParamField path="preview_limit" type="integer" default={25}>
+  Number of rows to preview when using markdown format.
+  
+  **Constraints:** Min: 1, Max: 200
+</ParamField>
+
+<ParamField path="save" type="object">
+  Save the results to a file.
+  
+  <Expandable title="properties">
+    <ParamField path="format" type="string" required>
+      File format: `csv` or `json`
+    </ParamField>
+    
+    <ParamField path="filename" type="string">
+      Custom filename. If not provided, auto-generates: `yf_lookup-{timestamp}.{format}`
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Use Cases
+
+### Find Stocks Only
+
+Filter lookup results to show only stock equities:
+
+```json
+{
+  "query": "Apple",
+  "kind": "stock",
+  "count": 5
+}
+```
+
+### Look Up ETFs
+
+Find ETFs matching a search term:
+
+```json
+{
+  "query": "S&P 500",
+  "kind": "etf",
+  "count": 10
+}
+```
+
+### Cryptocurrency Lookup
+
+Search for cryptocurrency tickers:
+
+```json
+{
+  "query": "Bitcoin",
+  "kind": "cryptocurrency",
+  "count": 5
+}
+```
+
+### Futures Contracts
+
+Find futures contracts:
+
+```json
+{
+  "query": "crude oil",
+  "kind": "future",
+  "count": 15
+}
+```
+
+## Asset Type Filtering
+
+The `kind` parameter helps you narrow down results when:
+
+- You're building a portfolio with specific asset types
+- You want to avoid confusion between stocks and ETFs with similar names
+- You're analyzing a specific market segment (e.g., only mutual funds)
+- You need futures or currency symbols for derivatives trading
+
+## Response Structure
+
+Lookup returns an array of matches with:
+- **Symbol**: Ticker symbol
+- **Name**: Full name of the security
+- **Exchange**: Trading exchange
+- **Type**: Asset type (matches the `kind` parameter if specified)
+
+## Lookup vs Search
+
+<Info>
+  **When to use `yf_lookup`:**
+  - You need to filter by specific asset types
+  - You want a simpler, faster response without news or research
+  - You're building type-specific queries (e.g., all ETFs matching a term)
+  
+  **When to use `yf_search`:**
+  - You want comprehensive results including news and research
+  - You need more context about the securities
+  - You're doing exploratory discovery
+</Info>
+
+<Tip>
+  Use `kind="stock"` when you want to ensure you're getting equity tickers and not funds or derivatives with similar names.
+</Tip>

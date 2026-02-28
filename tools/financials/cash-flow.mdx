@@ -1,0 +1,163 @@
+---
+title: 'Cash Flow Statement'
+description: 'Retrieve cash flow statement data for a ticker symbol'
+---
+
+## Overview
+
+The `yf_ticker_cash_flow` tool retrieves cash flow statement data for a specified ticker symbol. Cash flow statements show how changes in the balance sheet and income statement affect cash and cash equivalents, breaking down the analysis into operating, investing, and financing activities.
+
+## Parameters
+
+<ParamField path="ticker" type="string" required>
+  Ticker symbol to retrieve cash flow statement for (e.g., "AAPL", "MSFT", "GOOGL")
+</ParamField>
+
+<ParamField path="as_dict" type="boolean" default="false">
+  Return the data as a dictionary instead of a DataFrame format
+</ParamField>
+
+<ParamField path="pretty" type="boolean" default="false">
+  Return human-readable formatted output with better formatting for display
+</ParamField>
+
+<ParamField path="freq" type="string" default="yearly">
+  Frequency of the financial data to retrieve:
+  - `yearly` - Annual cash flow statements
+  - `quarterly` - Quarterly cash flow statements
+  - `trailing` - Trailing twelve months (TTM) cash flow data
+</ParamField>
+
+<ParamField path="response_format" type="string" default="json">
+  Format for the response:
+  - `json` - Returns structured JSON data
+  - `markdown` - Returns a formatted markdown table
+</ParamField>
+
+<ParamField path="preview_limit" type="number" default="25">
+  When using `response_format="markdown"`, limits the number of rows displayed (1-200)
+</ParamField>
+
+<ParamField path="save" type="object">
+  Options to save the result to a file:
+  - `format` - Either "csv" or "json"
+  - `filename` - Optional custom filename (defaults to auto-generated)
+</ParamField>
+
+## Data Returned
+
+The cash flow statement typically includes three main categories:
+
+### Operating Activities
+Cash generated from core business operations:
+- **Net Income** - Starting point from income statement
+- **Depreciation & Amortization** - Non-cash expenses added back
+- **Changes in Working Capital** - Changes in receivables, inventory, payables
+- **Operating Cash Flow** - Net cash from operations
+
+### Investing Activities
+Cash used for investments in assets:
+- **Capital Expenditures (CapEx)** - Purchases of property, plant, equipment
+- **Purchases/Sales of Investments** - Securities and financial instruments
+- **Acquisitions** - Purchases of other businesses
+- **Investing Cash Flow** - Net cash used in/from investing
+
+### Financing Activities
+Cash from financing sources:
+- **Debt Issuance/Repayment** - Borrowing and debt payments
+- **Stock Issuance/Repurchase** - Equity transactions
+- **Dividend Payments** - Cash paid to shareholders
+- **Financing Cash Flow** - Net cash from financing activities
+
+### Summary Metrics
+- **Free Cash Flow** - Operating cash flow minus capital expenditures
+- **Net Change in Cash** - Total change in cash position
+- **End Cash Position** - Final cash and equivalents balance
+
+## Examples
+
+### Yearly Cash Flow Statement
+
+Retrieve annual cash flow data:
+
+```json
+{
+  "ticker": "AAPL",
+  "freq": "yearly"
+}
+```
+
+### Quarterly Cash Flow Statement
+
+Get quarterly cash flow statements:
+
+```json
+{
+  "ticker": "AMZN",
+  "freq": "quarterly"
+}
+```
+
+### Trailing Twelve Months
+
+Retrieve TTM cash flow data:
+
+```json
+{
+  "ticker": "NFLX",
+  "freq": "trailing"
+}
+```
+
+### With Markdown Output
+
+Get a formatted markdown table for easy reading:
+
+```json
+{
+  "ticker": "META",
+  "freq": "quarterly",
+  "response_format": "markdown",
+  "preview_limit": 15
+}
+```
+
+### Dictionary Format with Pretty Output
+
+Retrieve as dictionary with human-readable formatting:
+
+```json
+{
+  "ticker": "GOOGL",
+  "freq": "yearly",
+  "as_dict": true,
+  "pretty": true
+}
+```
+
+### Save to CSV
+
+Retrieve and save the cash flow statement to a CSV file:
+
+```json
+{
+  "ticker": "TSLA",
+  "freq": "yearly",
+  "save": {
+    "format": "csv",
+    "filename": "tesla_cash_flow.csv"
+  }
+}
+```
+
+### Analyze Free Cash Flow Trends
+
+Get multiple periods to analyze free cash flow trends:
+
+```json
+{
+  "ticker": "MSFT",
+  "freq": "quarterly",
+  "response_format": "json"
+}
+```

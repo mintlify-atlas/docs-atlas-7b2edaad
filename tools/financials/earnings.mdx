@@ -1,0 +1,227 @@
+---
+title: 'Earnings Data'
+description: 'Retrieve earnings data, calendar events, and earnings dates for ticker symbols'
+---
+
+## Overview
+
+FinMCP provides three related tools for accessing earnings information:
+
+1. **`yf_ticker_earnings`** - Historical earnings data
+2. **`yf_ticker_calendar`** - Upcoming calendar events including earnings
+3. **`yf_ticker_earnings_dates`** - Detailed earnings date history with controls
+
+Each tool serves different use cases for analyzing company earnings.
+
+---
+
+## yf_ticker_earnings
+
+Retrieves historical earnings data for a ticker, showing actual reported earnings over time.
+
+### Parameters
+
+<ParamField path="ticker" type="string" required>
+  Ticker symbol to retrieve earnings for (e.g., "AAPL", "MSFT", "GOOGL")
+</ParamField>
+
+<ParamField path="response_format" type="string" default="json">
+  Format for the response:
+  - `json` - Returns structured JSON data
+  - `markdown` - Returns a formatted markdown table
+</ParamField>
+
+<ParamField path="preview_limit" type="number" default="25">
+  When using `response_format="markdown"`, limits the number of rows displayed (1-200)
+</ParamField>
+
+<ParamField path="save" type="object">
+  Options to save the result to a file:
+  - `format` - Either "csv" or "json"
+  - `filename` - Optional custom filename (defaults to auto-generated)
+</ParamField>
+
+### Data Returned
+
+Historical earnings typically include:
+- **Earnings Date** - When earnings were reported
+- **EPS Estimate** - Analyst consensus estimate
+- **EPS Actual** - Actual reported earnings per share
+- **Surprise %** - Percentage beat or miss vs. estimates
+- **Revenue** - Reported revenue figures
+
+### Example
+
+```json
+{
+  "ticker": "AAPL",
+  "response_format": "markdown"
+}
+```
+
+---
+
+## yf_ticker_calendar
+
+Retrieves upcoming calendar events for a ticker, including the next earnings date, ex-dividend date, and other important dates.
+
+### Parameters
+
+<ParamField path="ticker" type="string" required>
+  Ticker symbol to retrieve calendar for (e.g., "AAPL", "MSFT", "GOOGL")
+</ParamField>
+
+<ParamField path="response_format" type="string" default="json">
+  Format for the response:
+  - `json` - Returns structured JSON data
+  - `markdown` - Returns a formatted markdown table
+</ParamField>
+
+<ParamField path="preview_limit" type="number" default="25">
+  When using `response_format="markdown"`, limits the number of rows displayed (1-200)
+</ParamField>
+
+<ParamField path="save" type="object">
+  Options to save the result to a file:
+  - `format` - Either "csv" or "json"
+  - `filename` - Optional custom filename (defaults to auto-generated)
+</ParamField>
+
+### Data Returned
+
+Calendar information typically includes:
+- **Earnings Date** - Next scheduled earnings announcement
+- **Earnings Average** - Consensus EPS estimate
+- **Earnings Low** - Low-end EPS estimate
+- **Earnings High** - High-end EPS estimate
+- **Revenue Average** - Consensus revenue estimate
+- **Revenue Low** - Low-end revenue estimate
+- **Revenue High** - High-end revenue estimate
+- **Ex-Dividend Date** - Date when stock trades without dividend
+- **Dividend Date** - Date when dividend is paid
+
+### Example
+
+```json
+{
+  "ticker": "MSFT"
+}
+```
+
+---
+
+## yf_ticker_earnings_dates
+
+Retrieves a comprehensive list of earnings dates for a ticker with advanced filtering and sorting options. This tool provides more control than `yf_ticker_earnings` for accessing historical earnings dates.
+
+### Parameters
+
+<ParamField path="ticker" type="string" required>
+  Ticker symbol to retrieve earnings dates for (e.g., "AAPL", "MSFT", "GOOGL")
+</ParamField>
+
+<ParamField path="limit" type="number" default="12">
+  Maximum number of earnings dates to return (1-400). Controls how many historical/future earnings dates are retrieved.
+</ParamField>
+
+<ParamField path="sort" type="string">
+  Sort order for the earnings dates. Common values:
+  - `"asc"` - Ascending order (oldest first)
+  - `"desc"` - Descending order (newest first)
+  
+  If not specified, uses the default API ordering.
+</ParamField>
+
+<ParamField path="response_format" type="string" default="json">
+  Format for the response:
+  - `json` - Returns structured JSON data
+  - `markdown` - Returns a formatted markdown table
+</ParamField>
+
+<ParamField path="preview_limit" type="number" default="25">
+  When using `response_format="markdown"`, limits the number of rows displayed (1-200)
+</ParamField>
+
+<ParamField path="save" type="object">
+  Options to save the result to a file:
+  - `format` - Either "csv" or "json"
+  - `filename` - Optional custom filename (defaults to auto-generated)
+</ParamField>
+
+### Data Returned
+
+Detailed earnings dates including:
+- **Earnings Date** - Date and time of earnings announcement
+- **EPS Estimate** - Analyst consensus estimate
+- **Reported EPS** - Actual reported earnings per share
+- **Surprise %** - Beat or miss percentage
+
+### Examples
+
+#### Get Last 20 Earnings Dates
+
+```json
+{
+  "ticker": "GOOGL",
+  "limit": 20,
+  "sort": "desc"
+}
+```
+
+#### Get Earliest 10 Earnings Dates
+
+```json
+{
+  "ticker": "TSLA",
+  "limit": 10,
+  "sort": "asc"
+}
+```
+
+#### Retrieve Maximum Historical Data
+
+```json
+{
+  "ticker": "NVDA",
+  "limit": 400
+}
+```
+
+---
+
+## Tool Comparison
+
+### When to Use Each Tool
+
+| Tool | Best Used For | Key Features |
+|------|---------------|-------------|
+| `yf_ticker_earnings` | Quick earnings summary | Simple historical earnings data |
+| `yf_ticker_calendar` | Upcoming events | Next earnings date and estimates |
+| `yf_ticker_earnings_dates` | Detailed history | Advanced filtering with limit/sort |
+
+### Example: Complete Earnings Analysis
+
+Combine all three tools for comprehensive earnings analysis:
+
+```json
+// 1. Get upcoming earnings date
+{
+  "ticker": "AAPL"
+}
+// Use: yf_ticker_calendar
+
+// 2. Get recent earnings history
+{
+  "ticker": "AAPL",
+  "limit": 8,
+  "sort": "desc"
+}
+// Use: yf_ticker_earnings_dates
+
+// 3. Get full historical earnings data
+{
+  "ticker": "AAPL",
+  "response_format": "markdown"
+}
+// Use: yf_ticker_earnings
+```

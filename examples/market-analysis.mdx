@@ -1,0 +1,127 @@
+---
+title: Market Analysis Workflow
+description: Compare sectors, analyze market trends, and track multiple tickers
+---
+
+This example demonstrates a realistic market analysis workflow using FinMCP tools. You'll learn how to compare multiple stocks, analyze sector performance, and get market summaries.
+
+## Scenario: Comparing Tech Stocks
+
+Suppose you want to compare major tech companies and understand the broader technology sector trends.
+
+### Step 1: Download Historical Data for Multiple Tickers
+
+**Prompt to AI:**
+> "Get the last 3 months of daily price data for Apple, Microsoft, and Google"
+
+The AI assistant will use `yf_download` to fetch data for multiple tickers at once:
+
+```json
+{
+  "tickers": "AAPL MSFT GOOGL",
+  "period": "3mo",
+  "interval": "1d"
+}
+```
+
+**Response:** Returns a DataFrame with columns for Open, High, Low, Close, Volume, and Adj Close for each ticker.
+
+### Step 2: Compare Historical Performance
+
+**Prompt to AI:**
+> "Show me a side-by-side comparison of these stocks over the past year"
+
+The AI will use `yf_tickers_history` with column grouping:
+
+```json
+{
+  "tickers": "AAPL MSFT GOOGL",
+  "period": "1y",
+  "interval": "1wk",
+  "group_by": "ticker"
+}
+```
+
+**Response:** Returns historical data grouped by ticker for easy comparison.
+
+### Step 3: Get Market Summary
+
+**Prompt to AI:**
+> "What's the current US market status?"
+
+The AI uses `yf_market` to fetch market information:
+
+```json
+{
+  "market": "US",
+  "item": "summary"
+}
+```
+
+**Response:** Returns summary data including major indices, market hours, and trading status.
+
+### Step 4: Analyze Technology Sector
+
+**Prompt to AI:**
+> "Show me the top companies and overview of the technology sector"
+
+The AI uses `yf_sector` to get sector details:
+
+```json
+{
+  "key": "technology",
+  "field": "top_companies"
+}
+```
+
+**Response:** Returns the leading companies in the technology sector with performance metrics.
+
+### Step 5: Get Sector Overview
+
+**Prompt to AI:**
+> "What's the technology sector overview and trends?"
+
+```json
+{
+  "key": "technology",
+  "field": "overview"
+}
+```
+
+**Response:** Returns sector description, market cap, and key trends.
+
+## Saving Your Analysis
+
+You can export any dataset to CSV or JSON for further analysis:
+
+**Prompt to AI:**
+> "Export this comparison to a CSV file called tech_comparison.csv"
+
+The AI will add save parameters:
+
+```json
+{
+  "tickers": "AAPL MSFT GOOGL",
+  "period": "1y",
+  "save": {
+    "format": "csv",
+    "filename": "tech_comparison.csv"
+  }
+}
+```
+
+## Common Market Analysis Prompts
+
+- "Compare the performance of SPY, QQQ, and DIA over the past month"
+- "What are the top ETFs in the technology sector?"
+- "Show me the European market status"
+- "Get the top 10 companies in the healthcare sector"
+- "Download 5 years of weekly data for the S&P 500"
+
+## Tips
+
+- Use `period` for relative timeframes ("1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max")
+- Use `start` and `end` dates for specific date ranges (format: "YYYY-MM-DD")
+- The `interval` parameter accepts: "1m", "2m", "5m", "15m", "30m", "60m", "90m", "1h", "1d", "5d", "1wk", "1mo", "3mo"
+- Set `group_by: "ticker"` when comparing multiple stocks to organize data by symbol
+- Use `response_format: "markdown"` to get human-readable table output

@@ -1,0 +1,128 @@
+---
+title: 'Ticker Fast Info'
+description: 'Get lightweight, essential company metrics for a ticker'
+---
+
+The `yf_ticker_fast_info` tool retrieves a streamlined set of essential company metrics. It's a lightweight alternative to the full `yf_ticker_info` tool, optimized for quick access to commonly used data points.
+
+## Parameters
+
+<ParamField path="ticker" type="string" required>
+  Ticker symbol (e.g., "AAPL", "MSFT", "TSLA")
+</ParamField>
+
+<ParamField path="response_format" type="string" default="json">
+  Output format for the response
+  - `json` - Returns structured JSON data
+  - `markdown` - Returns formatted markdown tables
+</ParamField>
+
+<ParamField path="preview_limit" type="number" default="25">
+  Maximum number of rows to display in markdown preview (min: 1, max: 200)
+</ParamField>
+
+<ParamField path="save" type="object">
+  Save the result to a file
+  
+  <Expandable title="properties">
+    <ParamField path="format" type="string" required>
+      File format: `csv` or `json`
+    </ParamField>
+    <ParamField path="filename" type="string">
+      Custom filename (defaults to auto-generated name)
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## What Data is Included
+
+The fast info endpoint returns a focused set of key metrics:
+
+- **Price Information**: Last price, previous close, open
+- **Market Metrics**: Market capitalization, shares outstanding
+- **Trading Volume**: Volume, average volume
+- **Price Ranges**: Day high/low, 52-week high/low
+- **Valuation**: P/E ratio, earnings per share
+- **Dividends**: Dividend rate and yield
+- **Exchange**: Trading currency and timezone
+
+<Note>
+  Fast info excludes detailed company information like business summary, analyst recommendations, management details, and advanced financial metrics. For comprehensive data, use [ticker_info](/tools/company/info).
+</Note>
+
+## When to Use Fast Info vs Full Info
+
+**Use `yf_ticker_fast_info` when:**
+- You need quick access to current price and market cap
+- You're building dashboards or monitoring tools that poll frequently
+- You only need essential trading metrics
+- Performance and response time are critical
+
+**Use `yf_ticker_info` when:**
+- You need comprehensive company details and business information
+- You want analyst recommendations and target prices
+- You need detailed financial ratios and valuation metrics
+- You're conducting fundamental analysis or research
+
+## Example Usage
+
+<CodeGroup>
+```json Request
+{
+  "ticker": "MSFT"
+}
+```
+
+```json Response
+{
+  "data": {
+    "currency": "USD",
+    "dayHigh": 415.25,
+    "dayLow": 410.50,
+    "exchange": "NMS",
+    "fiftyDayAverage": 405.32,
+    "lastPrice": 413.84,
+    "lastVolume": 22500000,
+    "marketCap": 3076000000000,
+    "open": 411.20,
+    "previousClose": 410.15,
+    "quoteType": "EQUITY",
+    "regularMarketPreviousClose": 410.15,
+    "shares": 7430000000,
+    "tenDayAverageVolume": 24000000,
+    "threeMonthAverageVolume": 25500000,
+    "timezone": "EST",
+    "twoHundredDayAverage": 395.67,
+    "yearHigh": 420.82,
+    "yearLow": 362.90,
+    "yearChange": 0.142
+  },
+  "saved_path": null
+}
+```
+</CodeGroup>
+
+## Example with Markdown Format
+
+<CodeGroup>
+```json Request
+{
+  "ticker": "TSLA",
+  "response_format": "markdown"
+}
+```
+
+```markdown Response
+index | value
+--- | ---
+lastPrice | 245.32
+marketCap | 778000000000
+shares | 3170000000
+previousClose | 242.18
+dayHigh | 247.50
+dayLow | 243.10
+volume | 95000000
+yearHigh | 299.29
+yearLow | 138.80
+```
+</CodeGroup>

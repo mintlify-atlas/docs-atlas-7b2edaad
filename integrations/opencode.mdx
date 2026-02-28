@@ -1,0 +1,166 @@
+---
+title: OpenCode Integration
+description: Connect FinMCP to OpenCode for AI-powered financial analysis
+---
+
+Integrate FinMCP with OpenCode to provide your AI coding assistant with real-time financial market data and analysis capabilities.
+
+## Prerequisites
+
+Before integrating FinMCP with OpenCode, ensure you have:
+
+- OpenCode installed
+- Node.js 18+ installed
+- Python 3.10+ installed
+- Python dependencies installed:
+
+```bash
+pip install -r mcp/python/requirements.txt
+```
+
+<Note>
+Server logs are written to stderr, while stdout is reserved for MCP transport communication.
+</Note>
+
+## Installation
+
+<Steps>
+  <Step title="Locate OpenCode Configuration">
+    Find or create your `opencode.json` configuration file. This is typically located in your project root or OpenCode config directory.
+  </Step>
+
+  <Step title="Add FinMCP Configuration">
+    Add the FinMCP server configuration to your `opencode.json`:
+
+    ```json opencode.json
+    {
+      "$schema": "https://opencode.ai/config.json",
+      "mcp": {
+        "finmcp": {
+          "type": "local",
+          "command": ["npx", "-y", "finmcp"],
+          "enabled": true
+        }
+      }
+    }
+    ```
+
+    <Note>
+    The `-y` flag ensures npx automatically installs or uses the latest version of FinMCP without prompting.
+    </Note>
+  </Step>
+
+  <Step title="Enable the MCP Server">
+    The `"enabled": true` setting activates FinMCP when OpenCode starts. You can disable it temporarily by setting this to `false`.
+  </Step>
+
+  <Step title="Restart OpenCode">
+    Restart OpenCode to load the FinMCP server configuration.
+  </Step>
+
+  <Step title="Test the Integration">
+    In OpenCode, ask your AI assistant to perform a financial query:
+
+    ```
+    Fetch the current stock price for NVDA
+    ```
+
+    or
+
+    ```
+    Get historical data for MSFT and analyze the trend
+    ```
+
+    OpenCode will use FinMCP tools to retrieve the financial data.
+  </Step>
+</Steps>
+
+## Configuration Options
+
+### Server Type
+
+The `"type": "local"` setting indicates FinMCP runs as a local process using stdio transport.
+
+### Command Array
+
+The command array `["npx", "-y", "finmcp"]` specifies:
+
+- `npx` - Node package executor
+- `-y` - Auto-confirm package installation/execution
+- `finmcp` - The package to run
+
+### Alternative Configuration
+
+If you have FinMCP installed globally:
+
+```json opencode.json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "finmcp": {
+      "type": "local",
+      "command": ["finmcp"],
+      "enabled": true
+    }
+  }
+}
+```
+
+## Multiple MCP Servers
+
+You can run FinMCP alongside other MCP servers:
+
+```json opencode.json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "finmcp": {
+      "type": "local",
+      "command": ["npx", "-y", "finmcp"],
+      "enabled": true
+    },
+    "another-mcp": {
+      "type": "local",
+      "command": ["npx", "-y", "another-mcp"],
+      "enabled": true
+    }
+  }
+}
+```
+
+## Troubleshooting
+
+### Server Not Loading
+
+If FinMCP doesn't load in OpenCode:
+
+1. Check the `opencode.json` syntax is valid JSON
+2. Verify Python 3.10+ is installed: `python --version`
+3. Ensure yfinance dependencies are installed
+4. Check OpenCode logs for error messages
+
+### Command Not Found
+
+If you see "command not found" errors:
+
+- Verify Node.js and npx are in your PATH
+- Try using the full path to npx in the command array
+- Install FinMCP globally: `npm install -g finmcp`
+
+### Enabling/Disabling
+
+To temporarily disable FinMCP without removing the configuration:
+
+```json
+"finmcp": {
+  "type": "local",
+  "command": ["npx", "-y", "finmcp"],
+  "enabled": false
+}
+```
+
+## Next Steps
+
+- Explore available [tools](/tools/overview) in FinMCP
+- Learn about [data sources](/data-sources) and market coverage
+- Check out [example queries](/examples) for inspiration

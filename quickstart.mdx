@@ -1,80 +1,251 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quick Start
+description: Get started with FinMCP in minutes by adding it to Claude or OpenCode
 ---
 
-## Get started in three steps
+## Add FinMCP to Your AI Assistant
 
-Get your documentation site running locally and make your first customization.
+FinMCP works with any MCP-compatible AI assistant. Follow the instructions below for your preferred client.
 
-### Step 1: Set up your local environment
+<Tabs>
+  <Tab title="Claude Desktop">
+    <Steps>
+      <Step title="Add FinMCP to Claude">
+        Use the Claude CLI to add FinMCP as an MCP server:
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+        ```bash
+        claude mcp add finmcp -- npx -y finmcp
+        ```
 
-### Step 2: Deploy your changes
+        This command registers FinMCP with Claude Desktop.
+      </Step>
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+      <Step title="Restart Claude Desktop">
+        Close and reopen Claude Desktop for the changes to take effect.
+      </Step>
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+      <Step title="Verify Connection">
+        In Claude, you should see FinMCP tools available. Try asking:
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+        > "What tools do you have access to from FinMCP?"
+      </Step>
+    </Steps>
+  </Tab>
 
-### Step 3: Go live
+  <Tab title="OpenCode">
+    <Steps>
+      <Step title="Open OpenCode Config">
+        Create or edit your OpenCode configuration file at `~/.config/opencode/config.json`
+      </Step>
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+      <Step title="Add FinMCP Configuration">
+        Add the following to your config file:
 
-## Next steps
+        ```json
+        {
+          "$schema": "https://opencode.ai/config.json",
+          "mcp": {
+            "finmcp": {
+              "type": "local",
+              "command": ["npx", "-y", "finmcp"],
+              "enabled": true
+            }
+          }
+        }
+        ```
+      </Step>
 
-Now that you have your docs running, explore these key features:
+      <Step title="Restart OpenCode">
+        Restart OpenCode to load the new MCP server configuration.
+      </Step>
 
-<CardGroup cols={2}>
+      <Step title="Verify Connection">
+        FinMCP tools should now be available. Ask OpenCode:
 
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
-</CardGroup>
+        > "List the FinMCP tools available"
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
 
 <Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
+  Make sure you've completed the [installation steps](/installation) before configuring your AI assistant.
 </Note>
+
+## Your First Query
+
+Let's fetch information about Apple Inc. (AAPL) using the `yf_ticker_info` tool.
+
+<Steps>
+  <Step title="Ask for Stock Information">
+    In your AI assistant, ask:
+
+    > "Get me information about Apple stock using yf_ticker_info"
+
+    Or more naturally:
+
+    > "What's Apple's current market cap and sector?"
+  </Step>
+
+  <Step title="Review the Response">
+    By default, FinMCP returns data in JSON format:
+
+    ```json
+    {
+      "data": {
+        "symbol": "AAPL",
+        "shortName": "Apple Inc.",
+        "sector": "Technology",
+        "industry": "Consumer Electronics",
+        "marketCap": 3500000000000,
+        "previousClose": 195.71,
+        "regularMarketPrice": 196.45,
+        "fiftyTwoWeekLow": 164.08,
+        "fiftyTwoWeekHigh": 199.62,
+        "dividendYield": 0.0046,
+        "trailingPE": 32.5,
+        "forwardPE": 28.9,
+        "website": "https://www.apple.com",
+        "longBusinessSummary": "Apple Inc. designs, manufactures..."
+      },
+      "saved_path": null
+    }
+    ```
+  </Step>
+</Steps>
+
+## Output Format Options
+
+FinMCP supports multiple output formats to suit your needs.
+
+### Markdown Tables
+
+For tabular data like price history, use `response_format: "markdown"`:
+
+```
+Get Apple's price history for the last 5 days in markdown format
+```
+
+Response:
+
+```markdown
+index | Open | High | Low | Close | Volume | Dividends | Stock Splits
+--- | --- | --- | --- | --- | --- | --- | ---
+2024-01-15 | 185.89 | 187.12 | 185.33 | 186.86 | 52483100 | 0 | 0
+2024-01-16 | 187.20 | 189.14 | 186.48 | 188.63 | 71207600 | 0 | 0
+2024-01-17 | 188.99 | 189.69 | 186.63 | 188.04 | 70088800 | 0 | 0
+2024-01-18 | 188.28 | 191.56 | 188.19 | 191.56 | 71185200 | 0 | 0
+2024-01-19 | 191.86 | 192.90 | 191.18 | 192.53 | 51814200 | 0 | 0
+```
+
+### Save to File
+
+Export data to CSV or JSON for further analysis:
+
+```
+Get Apple's quarterly income statement and save it as CSV
+```
+
+The assistant will use the `save` option:
+
+```json
+{
+  "ticker": "AAPL",
+  "freq": "quarterly",
+  "save": {
+    "format": "csv",
+    "filename": "aapl-income-statement.csv"
+  }
+}
+```
+
+Response:
+
+```
+Saved to /path/to/working/directory/aapl-income-statement.csv
+```
+
+### Preview Limits
+
+For large datasets, control how many rows are displayed:
+
+```
+Show me the first 10 rows of Apple's earnings dates
+```
+
+The assistant will use `preview_limit: 10` to limit the output.
+
+## Example Queries
+
+Here are some example queries to explore FinMCP's capabilities:
+
+<AccordionGroup>
+  <Accordion title="Stock Fundamentals">
+    - "What's Tesla's P/E ratio and market cap?"
+    - "Show me Microsoft's quarterly revenue for the last year"
+    - "Get the balance sheet for NVDA"
+  </Accordion>
+
+  <Accordion title="Price History">
+    - "Get Apple's stock price history for the last month"
+    - "Show me SPY's daily prices with dividends included"
+    - "Download price data for AAPL, MSFT, and GOOGL"
+  </Accordion>
+
+  <Accordion title="Analyst Data">
+    - "What are analysts' price targets for Amazon?"
+    - "Show recent upgrades and downgrades for TSLA"
+    - "Get the analyst recommendations summary for META"
+  </Accordion>
+
+  <Accordion title="Insider Activity">
+    - "Show insider purchases for AAPL in the last quarter"
+    - "What are the major institutional holders of MSFT?"
+    - "Get recent insider transactions for NVDA"
+  </Accordion>
+
+  <Accordion title="Market Discovery">
+    - "Search for stocks in the semiconductor industry"
+    - "Show me today's earnings calendar"
+    - "Find technology sector ETFs"
+    - "Screen for stocks with P/E ratio below 15 and dividend yield above 3%"
+  </Accordion>
+</AccordionGroup>
+
+## Understanding Tool Parameters
+
+Most FinMCP tools accept these common parameters:
+
+- **ticker** (required for ticker-specific tools): Stock symbol, e.g., "AAPL", "MSFT"
+- **response_format**: "json" (default) or "markdown"
+- **preview_limit**: Number of rows to display (default: 25, max: 200)
+- **save**: Object with `format` ("csv" or "json") and optional `filename`
+
+Example with all options:
+
+```json
+{
+  "ticker": "AAPL",
+  "response_format": "markdown",
+  "preview_limit": 10,
+  "save": {
+    "format": "csv",
+    "filename": "aapl-data.csv"
+  }
+}
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Tool Reference" icon="book" href="/tools">
+    Explore all 50+ tools available in FinMCP
+  </Card>
+  <Card title="Examples" icon="lightbulb" href="/examples">
+    See real-world examples and use cases
+  </Card>
+</CardGroup>
+
+<Tip>
+  **Pro tip**: You don't need to specify tool names explicitly. Just ask natural questions like "What's Apple's market cap?" and your AI assistant will choose the appropriate FinMCP tool.
+</Tip>

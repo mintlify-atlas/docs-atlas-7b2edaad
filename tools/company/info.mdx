@@ -1,0 +1,113 @@
+---
+title: 'Ticker Info'
+description: 'Get comprehensive company information for a ticker'
+---
+
+The `yf_ticker_info` tool retrieves a complete information dictionary for a given ticker symbol, providing comprehensive company data including business details, financials, valuation metrics, and more.
+
+## Parameters
+
+<ParamField path="ticker" type="string" required>
+  Ticker symbol (e.g., "AAPL", "MSFT", "TSLA")
+</ParamField>
+
+<ParamField path="response_format" type="string" default="json">
+  Output format for the response
+  - `json` - Returns structured JSON data
+  - `markdown` - Returns formatted markdown tables
+</ParamField>
+
+<ParamField path="preview_limit" type="number" default="25">
+  Maximum number of rows to display in markdown preview (min: 1, max: 200)
+</ParamField>
+
+<ParamField path="save" type="object">
+  Save the result to a file
+  
+  <Expandable title="properties">
+    <ParamField path="format" type="string" required>
+      File format: `csv` or `json`
+    </ParamField>
+    <ParamField path="filename" type="string">
+      Custom filename (defaults to auto-generated name)
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## What Information is Returned
+
+The tool returns a comprehensive dictionary containing:
+
+- **Company Overview**: Name, sector, industry, business summary, website
+- **Trading Information**: Exchange, currency, market state, quote type
+- **Financial Metrics**: Market cap, enterprise value, revenue, EBITDA, profit margins
+- **Valuation Ratios**: P/E ratio, PEG ratio, price-to-book, price-to-sales
+- **Stock Statistics**: Beta, 52-week high/low, average volume, shares outstanding
+- **Dividend Information**: Dividend rate, yield, payout ratio, ex-dividend date
+- **Analyst Data**: Target prices, recommendations, number of analyst opinions
+- **Leadership**: Company officers and management team
+- **Company Contact**: Address, phone, website
+
+## Example Usage
+
+<CodeGroup>
+```json Request
+{
+  "ticker": "AAPL"
+}
+```
+
+```json Response (Sample Fields)
+{
+  "data": {
+    "symbol": "AAPL",
+    "shortName": "Apple Inc.",
+    "longName": "Apple Inc.",
+    "sector": "Technology",
+    "industry": "Consumer Electronics",
+    "website": "https://www.apple.com",
+    "marketCap": 2890000000000,
+    "enterpriseValue": 2950000000000,
+    "trailingPE": 29.5,
+    "forwardPE": 27.3,
+    "priceToBook": 45.2,
+    "dividendYield": 0.0048,
+    "targetMeanPrice": 195.0,
+    "recommendationKey": "buy",
+    "numberOfAnalystOpinions": 42,
+    "fiftyTwoWeekHigh": 199.62,
+    "fiftyTwoWeekLow": 164.08,
+    "businessSummary": "Apple Inc. designs, manufactures, and markets smartphones..."
+  },
+  "saved_path": null
+}
+```
+</CodeGroup>
+
+## Example with Save Option
+
+<CodeGroup>
+```json Request
+{
+  "ticker": "AAPL",
+  "save": {
+    "format": "json",
+    "filename": "apple_info.json"
+  }
+```
+
+```json Response
+{
+  "data": {
+    "symbol": "AAPL",
+    "shortName": "Apple Inc.",
+    ...
+  },
+  "saved_path": "/path/to/apple_info.json"
+}
+```
+</CodeGroup>
+
+<Note>
+  The ticker info endpoint provides the most comprehensive dataset available. If you only need basic metrics like price and market cap, consider using the [fast_info](/tools/company/fast-info) tool for better performance.
+</Note>

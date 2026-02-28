@@ -1,0 +1,272 @@
+---
+title: Portfolio Tracking Workflow
+description: Monitor your holdings, track dividends, and analyze portfolio performance
+---
+
+This example shows how to use FinMCP to track a portfolio, monitor individual positions, and analyze dividend income.
+
+## Scenario: Tracking Your Portfolio
+
+Let's say you have a portfolio with several holdings and want to monitor performance and income.
+
+### Step 1: Get Current Prices
+
+**Prompt to AI:**
+> "Get the latest prices for my portfolio: Apple, Microsoft, Johnson & Johnson, and Vanguard S&P 500 ETF"
+
+The AI uses `yf_download` for a quick snapshot:
+
+```json
+{
+  "tickers": "AAPL MSFT JNJ VOO",
+  "period": "1d",
+  "interval": "1d"
+}
+```
+
+**Response:** Returns the most recent trading day's OHLCV data for all tickers.
+
+### Step 2: Track Historical Performance
+
+**Prompt to AI:**
+> "Show me how these stocks performed over the past 6 months"
+
+The AI uses `yf_tickers_history`:
+
+```json
+{
+  "tickers": "AAPL MSFT JNJ VOO",
+  "period": "6mo",
+  "interval": "1d",
+  "group_by": "ticker"
+}
+```
+
+**Response:** Returns 6 months of daily price history grouped by ticker for easy comparison.
+
+### Step 3: Monitor Dividend Income
+
+**Prompt to AI:**
+> "Show me all dividends paid by Johnson & Johnson"
+
+The AI uses `yf_ticker_dividends`:
+
+```json
+{
+  "ticker": "JNJ"
+}
+```
+
+**Response:** Returns complete dividend history with payment dates and amounts.
+
+**Prompt to AI:**
+> "Get the dividend history for all my dividend-paying stocks"
+
+For each dividend stock, the AI uses `yf_ticker_dividends`:
+
+```json
+{
+  "ticker": "JNJ"
+}
+```
+
+```json
+{
+  "ticker": "MSFT"
+}
+```
+
+### Step 4: Check Upcoming Events
+
+**Prompt to AI:**
+> "When is Apple's next earnings report?"
+
+The AI uses `yf_ticker_calendar`:
+
+```json
+{
+  "ticker": "AAPL"
+}
+```
+
+**Response:** Returns upcoming events including earnings date, ex-dividend date, and dividend amount.
+
+### Step 5: Export Portfolio Data
+
+**Prompt to AI:**
+> "Export my portfolio's 1-year performance to a CSV file called portfolio_2025.csv"
+
+The AI uses `yf_tickers_history` with save parameter:
+
+```json
+{
+  "tickers": "AAPL MSFT JNJ VOO",
+  "period": "1y",
+  "interval": "1d",
+  "group_by": "ticker",
+  "save": {
+    "format": "csv",
+    "filename": "portfolio_2025.csv"
+  }
+}
+```
+
+**Response:** Returns data preview and saves the complete dataset to `portfolio_2025.csv`.
+
+## Advanced Portfolio Analysis
+
+### Tracking Splits and Corporate Actions
+
+**Prompt to AI:**
+> "Check if any of my stocks had splits recently"
+
+The AI uses `yf_ticker_splits` for each ticker:
+
+```json
+{
+  "ticker": "AAPL"
+}
+```
+
+**Response:** Returns stock split history with dates and split ratios.
+
+### Monitoring Cost Basis Adjustments
+
+**Prompt to AI:**
+> "Get all corporate actions for Microsoft"
+
+The AI uses `yf_ticker_actions`:
+
+```json
+{
+  "ticker": "MSFT"
+}
+```
+
+**Response:** Returns both dividends and splits in a single DataFrame.
+
+### Analyzing Holdings
+
+**Prompt to AI:**
+> "Show me detailed information about my ETF holdings"
+
+For VOO (Vanguard S&P 500 ETF), the AI uses `yf_ticker_funds_data`:
+
+```json
+{
+  "ticker": "VOO"
+}
+```
+
+**Response:** Returns fund-specific data like top holdings, sector weightings, and expense ratio.
+
+## Building a Complete Portfolio Dashboard
+
+Here's how you might ask for a comprehensive portfolio update:
+
+**Prompt to AI:**
+> "Give me a complete portfolio update for AAPL, MSFT, JNJ, and VOO"
+
+**AI would use:**
+1. `yf_tickers_history` - Recent price data (1 week)
+2. `yf_ticker_info` - Key metrics for each (P/E, market cap, etc.)
+3. `yf_ticker_dividends` - Dividend history for each
+4. `yf_ticker_calendar` - Upcoming events for each
+5. `yf_ticker_news` - Recent news for portfolio holdings
+
+## Dividend Income Tracking
+
+**Prompt to AI:**
+> "Calculate my total dividend income from JNJ over the past 5 years"
+
+The AI uses `yf_ticker_dividends`:
+
+```json
+{
+  "ticker": "JNJ"
+}
+```
+
+You can then multiply the dividend amounts by your share count to calculate total income.
+
+**Prompt to AI:**
+> "Export all dividend data for my holdings"
+
+For a multi-ticker dividend export:
+
+```json
+{
+  "ticker": "AAPL",
+  "save": {
+    "format": "csv",
+    "filename": "aapl_dividends.csv"
+  }
+}
+```
+
+Repeat for each dividend-paying stock.
+
+## Rebalancing Analysis
+
+**Prompt to AI:**
+> "Show me year-to-date performance for my portfolio"
+
+The AI uses `yf_tickers_history`:
+
+```json
+{
+  "tickers": "AAPL MSFT JNJ VOO",
+  "period": "ytd",
+  "interval": "1d",
+  "group_by": "ticker"
+}
+```
+
+This helps identify which positions have grown or shrunk relative to others.
+
+## Common Portfolio Tracking Prompts
+
+- "Get today's closing prices for AAPL, MSFT, GOOGL"
+- "Show me 1-year returns for my tech stocks"
+- "When is the next ex-dividend date for AT&T?"
+- "Get the full dividend history for Procter & Gamble"
+- "Export 2 years of monthly data for my entire portfolio"
+- "Check if any of my stocks announced splits"
+- "Show me analyst ratings for my holdings"
+- "Get the latest news for stocks I own"
+
+## Tips for Portfolio Management
+
+- Use `period: "1d"` for daily monitoring and quick price checks
+- Set `interval: "1wk"` or `"1mo"` for long-term trend analysis
+- Use `auto_adjust: true` to get adjusted prices accounting for splits and dividends
+- Export data regularly with the `save` parameter to maintain historical records
+- Use `yf_ticker_fast_info` for quick portfolio scans without full company data
+- Combine `yf_ticker_dividends` with `yf_ticker_splits` to calculate accurate cost basis
+- Set up regular checks of `yf_ticker_calendar` to track ex-dividend dates
+- Use `response_format: "markdown"` for human-readable portfolio reports
+
+## Example: Complete Portfolio Export
+
+To export everything at once:
+
+**Prompt to AI:**
+> "Create a comprehensive data export of my portfolio with 1 year of price history, dividend history, and current fundamentals"
+
+The AI would:
+1. Export historical prices to `portfolio_prices.csv`
+2. Export dividend data to `portfolio_dividends.csv`
+3. Export company info to `portfolio_info.json`
+
+Each export uses the `save` parameter:
+
+```json
+{
+  "tickers": "AAPL MSFT JNJ VOO",
+  "period": "1y",
+  "save": {
+    "format": "csv",
+    "filename": "portfolio_prices.csv"
+  }
+}
+```

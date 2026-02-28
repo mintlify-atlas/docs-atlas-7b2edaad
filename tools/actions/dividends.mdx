@@ -1,0 +1,103 @@
+---
+title: 'yf_ticker_dividends'
+description: 'Get dividend history for a ticker'
+---
+
+## Description
+
+Returns the complete dividend payment history for a given ticker symbol. This includes all dividend payments made to shareholders over the available historical period.
+
+## Parameters
+
+<ParamField path="ticker" type="string" required>
+  Ticker symbol (e.g., "AAPL", "MSFT", "KO")
+</ParamField>
+
+<ParamField path="response_format" type="enum" default="json">
+  Output format: `"json"` or `"markdown"`
+</ParamField>
+
+<ParamField path="preview_limit" type="integer" default="25">
+  Number of rows to preview in markdown format (min: 1, max: 200)
+</ParamField>
+
+<ParamField path="save" type="object">
+  Save results to a file
+  
+  <Expandable title="properties">
+    <ParamField path="format" type="enum" required>
+      File format: `"csv"` or `"json"`
+    </ParamField>
+    
+    <ParamField path="filename" type="string">
+      Custom filename (defaults to `yf_ticker_dividends-{timestamp}.{ext}`)
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Data Structure
+
+Returns a pandas Series with:
+- **Index**: Dividend payment dates (datetime)
+- **Values**: Dividend amount per share (float)
+
+The data represents the cash dividend amount paid per share on each payment date.
+
+## Example
+
+<CodeGroup>
+```json Request
+{
+  "ticker": "AAPL"
+}
+```
+
+```json Response
+{
+  "data": {
+    "__type__": "series",
+    "name": "Dividends",
+    "index": [
+      "1987-05-11",
+      "1987-08-10",
+      "1987-11-17",
+      "2012-08-16",
+      "2012-11-15",
+      "2023-11-16",
+      "2024-02-15",
+      "2024-05-16",
+      "2024-08-15",
+      "2024-11-14"
+    ],
+    "data": [
+      0.00098214,
+      0.00098214,
+      0.00098214,
+      0.37857,
+      0.37857,
+      0.24,
+      0.24,
+      0.25,
+      0.25,
+      0.25
+    ]
+  },
+  "saved_path": null
+}
+```
+</CodeGroup>
+
+## Use Cases
+
+- Calculate dividend yields and growth rates
+- Analyze dividend payment consistency
+- Compare dividend policies across companies
+- Build dividend-focused investment strategies
+- Track dividend reinvestment (DRIP) opportunities
+
+## Related Tools
+
+- [yf_ticker_splits](/tools/actions/splits) - Get stock split history
+- [yf_ticker_capital_gains](/tools/actions/capital-gains) - Get capital gains distributions
+- [yf_ticker_info](/tools/company/info) - Get dividend yield and payout ratio from company info
+- [yf_ticker_calendar](/tools/financials/earnings) - Get upcoming dividend dates

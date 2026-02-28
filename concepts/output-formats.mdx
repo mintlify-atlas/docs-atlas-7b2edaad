@@ -1,0 +1,277 @@
+---
+title: Output Formats
+description: Control how FinMCP returns financial data with response_format and preview_limit
+---
+
+## Overview
+
+FinMCP supports flexible output formatting to optimize data presentation for different use cases. Every tool accepts optional output parameters that control:
+
+- **Response format**: JSON (default) or Markdown tables
+- **Preview limit**: Number of rows to display in Markdown tables
+
+## Output Options Schema
+
+All FinMCP tools extend a common output options schema defined in `src/index.ts`:
+
+```typescript
+const responseFormatSchema = z.enum(["json", "markdown"]).default("json");
+
+const outputOptionsSchema = z.object({
+  response_format: responseFormatSchema.optional(),
+  preview_limit: z.number().int().min(1).max(200).optional(),
+  save: saveSchema,  // Covered in Data Export guide
+});
+```
+
+These options are merged into every tool's schema:
+
+```typescript
+const historySchema = tickerSchema
+  .extend({
+    period: z.string().optional(),
+    interval: z.string().optional(),
+    // ... other parameters
+  })
+  .merge(outputOptionsSchema);  // Adds response_format, preview_limit, save
+```
+
+## JSON Format (Default)
+
+When `response_format` is `"json"` or omitted, FinMCP returns structured JSON data.
+
+### DataFrame Response
+
+DataFrames are serialized with metadata about structure:
+
+```json
+{
+  "data": {
+    "__type__": "dataframe",
+    "columns": ["Open", "High", "Low", "Close", "Volume"],
+    "index": ["2024-01-01T00:00:00", "2024-01-02T00:00:00"],
+    "data": [
+      [150.0, 152.5, 149.8, 151.2, 50000000],
+      [151.5, 153.0, 150.5, 152.8, 48000000]
+    ]
+  },
+  "saved_path": null
+}
+```
+
+### Series Response
+
+Series (1-dimensional data) include index and values:
+
+```json
+{
+  "data": {
+    "__type__": "series",
+    "name": "Close",
+    "index": ["2024-01-01T00:00:00", "2024-01-02T00:00:00"],
+    "data": [151.2, 152.8]
+  },
+  "saved_path": null
+}
+```
+
+### Object/Array Response
+
+Non-tabular data is returned as plain JSON:
+
+```json
+{
+  "data": {
+    "symbol": "AAPL",
+    "longName": "Apple Inc.",
+    "marketCap": 3000000000000
+  },
+  "saved_path": null
+}
+```
+
+<Note>
+The `saved_path` field indicates if data was exported to a file. See [Data Export](/concepts/data-export) for details.
+</Note>
+
+## Markdown Format
+
+When `response_format` is `"markdown"`, tabular data (DataFrames and Series) is formatted as Markdown tables.
+
+### Implementation
+
+The `toMarkdown` function in `src/index.ts:176` handles Markdown conversion:
+
+```typescript
+function toMarkdown(result: unknown, previewLimit: number): string {
+  if (isDataFrame(result)) {
+    const rows = result.data.slice(0, previewLimit);
+    const header = ["index", ...result.columns];
+    const separator = header.map(() => "---");
+    const body = rows.map((row, idx) => [result.index[idx], ...row]);
+    const table = [header, separator, ...body]
+      .map((row) => row.map((cell) => String(cell ?? "")).join(" | "))
+      .join("\n");
+    return table;
+  }
+
+  if (isSeries(result)) {
+    const rows = result.data.slice(0, previewLimit).map((value, idx) => [result.index[idx], value]);
+    const header = ["index", result.name ?? "value"];
+    const separator = header.map(() => "---");
+    const table = [header, separator, ...rows]
+      .map((row) => row.map((cell) => String(cell ?? "")).join(" | "))
+      .join("\n");
+    return table;
+  }
+
+  return `\n\n\`\`\`json\n${stringifyJson(result)}\n\`\`\`\n`;
+}
+```
+
+### DataFrame Markdown Example
+
+<CodeGroup>
+```bash Request
+yf_ticker_history(
+  ticker="AAPL",
+  period="5d",
+  response_format="markdown",
+  preview_limit=3
+)
+```
+
+```markdown Response
+index | Open | High | Low | Close | Volume
+--- | --- | --- | --- | --- | ---
+2024-02-20T00:00:00 | 182.31 | 184.96 | 182.08 | 184.12 | 45703200
+2024-02-21T00:00:00 | 183.94 | 185.15 | 182.76 | 184.98 | 52583200
+2024-02-22T00:00:00 | 184.26 | 185.34 | 183.15 | 184.37 | 46890100
+```
+</CodeGroup>
+
+### Series Markdown Example
+
+<CodeGroup>
+```bash Request
+yf_ticker_dividends(
+  ticker="AAPL",
+  response_format="markdown",
+  preview_limit=5
+)
+```
+
+```markdown Response
+index | Dividends
+--- | ---
+2023-08-11T00:00:00 | 0.24
+2023-11-10T00:00:00 | 0.24
+2024-02-09T00:00:00 | 0.24
+```
+</CodeGroup>
+
+## preview_limit Parameter
+
+The `preview_limit` parameter controls how many rows appear in Markdown tables.
+
+<ParamField path="preview_limit" type="integer" default="25">
+  Number of rows to include in Markdown table output. Must be between 1 and 200.
+</ParamField>
+
+### Default Behavior
+
+From `src/index.ts:39`:
+
+```typescript
+function extractPreviewLimit(options?: OutputOptions): number {
+  return options?.preview_limit ?? 25;  // Default: 25 rows
+}
+```
+
+### Usage Example
+
+```typescript
+// Get 1 year of daily data, but only preview first 10 days
+yf_ticker_history(
+  ticker="MSFT",
+  period="1y",
+  response_format="markdown",
+  preview_limit=10  // Only show 10 rows in table
+)
+```
+
+<Tip>
+Use `preview_limit` with `save` to view a preview while saving the full dataset to a file.
+</Tip>
+
+## Non-Tabular Data in Markdown
+
+When `response_format="markdown"` is used with non-tabular data (objects, arrays), the data is returned as a JSON code block:
+
+```typescript
+return `\n\n\`\`\`json\n${stringifyJson(result)}\n\`\`\`\n`;
+```
+
+Example:
+
+<CodeGroup>
+```bash Request
+yf_ticker_info(
+  ticker="TSLA",
+  response_format="markdown"
+)
+```
+
+```markdown Response
+\`\`\`json
+{
+  "symbol": "TSLA",
+  "longName": "Tesla, Inc.",
+  "industry": "Auto Manufacturers",
+  "marketCap": 600000000000
+}
+\`\`\`
+```
+</CodeGroup>
+
+## Response Building
+
+The `buildResponse` function in `src/index.ts:201` orchestrates format selection:
+
+```typescript
+async function buildResponse(toolName: string, result: unknown, options?: OutputOptions) {
+  let savedPath: string | undefined;
+  if (options?.save) {
+    savedPath = await saveResult(result, options.save, toolName);
+  }
+
+  if ((options?.response_format ?? "json") === "markdown") {
+    const preview = toMarkdown(result, extractPreviewLimit(options));
+    const savedNote = savedPath ? `\n\nSaved to ${savedPath}` : "";
+    return preview + savedNote;
+  }
+
+  const payload = {
+    data: result,
+    saved_path: savedPath ?? null,
+  };
+  return stringifyJson(payload);
+}
+```
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Use JSON for Processing" icon="code">
+    JSON format preserves full data structure and types, ideal for programmatic analysis
+  </Card>
+  <Card title="Use Markdown for Display" icon="table">
+    Markdown tables are human-readable and render well in chat interfaces
+  </Card>
+  <Card title="Combine with Export" icon="floppy-disk">
+    Use `save` parameter to persist full data while getting a preview response
+  </Card>
+  <Card title="Adjust Preview Limit" icon="sliders">
+    Set `preview_limit` based on context size constraints and readability needs
+  </Card>
+</CardGroup>

@@ -1,0 +1,301 @@
+---
+title: Calendars
+description: Access earnings, IPO, splits, and economic event calendars
+---
+
+The `yf_calendars` tool provides access to Yahoo Finance's calendar data for upcoming market events including earnings releases, IPO listings, stock splits, and economic indicators.
+
+## Parameters
+
+<ParamField path="calendar_type" type="string" required>
+  Type of calendar to fetch.
+  
+  **Options:**
+  - `earnings` - Earnings announcements and release dates
+  - `ipo` - Initial public offerings and new listings
+  - `splits` - Stock split events
+  - `economic_events` - Economic indicators and government data releases
+</ParamField>
+
+<ParamField path="start" type="string">
+  Start date for the calendar range. Format: `YYYY-MM-DD`
+  
+  If not specified, defaults to today's date.
+</ParamField>
+
+<ParamField path="end" type="string">
+  End date for the calendar range. Format: `YYYY-MM-DD`
+  
+  If not specified, defaults to a reasonable future date based on calendar type.
+</ParamField>
+
+<ParamField path="limit" type="integer" default={100}>
+  Maximum number of calendar events to return.
+  
+  **Constraints:** Min: 1, Max: 500
+</ParamField>
+
+<ParamField path="market_cap" type="number">
+  Filter by minimum market capitalization (in USD).
+  
+  Use this to focus on larger companies and reduce noise from small-cap stocks.
+</ParamField>
+
+<ParamField path="filter_most_active" type="boolean" default={false}>
+  Filter results to show only the most actively traded securities.
+  
+  Useful for focusing on high-liquidity stocks with more market impact.
+</ParamField>
+
+### Output Options
+
+<ParamField path="response_format" type="string" default="json">
+  Format of the response data.
+  
+  **Options:** `json`, `markdown`
+</ParamField>
+
+<ParamField path="preview_limit" type="integer" default={25}>
+  Number of rows to preview when using markdown format.
+  
+  **Constraints:** Min: 1, Max: 200
+</ParamField>
+
+<ParamField path="save" type="object">
+  Save the results to a file.
+  
+  <Expandable title="properties">
+    <ParamField path="format" type="string" required>
+      File format: `csv` or `json`
+    </ParamField>
+    
+    <ParamField path="filename" type="string">
+      Custom filename. If not provided, auto-generates: `yf_calendars-{timestamp}.{format}`
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Calendar Types
+
+### Earnings Calendar
+
+Track upcoming earnings announcements and historical earnings dates.
+
+**Use cases:**
+- Plan trades around earnings releases
+- Track earnings seasons across sectors
+- Monitor earnings dates for portfolio holdings
+- Analyze earnings surprise patterns
+
+**Example:**
+```json
+{
+  "calendar_type": "earnings",
+  "start": "2024-01-15",
+  "end": "2024-01-19",
+  "limit": 100,
+  "market_cap": 10000000000
+}
+```
+
+This returns earnings announcements for companies with market cap over $10B during the specified week.
+
+### IPO Calendar
+
+Discover upcoming initial public offerings and new listings.
+
+**Use cases:**
+- Track new market entrants
+- Identify investment opportunities in newly public companies
+- Monitor IPO pricing and performance
+- Analyze market appetite for new offerings
+
+**Example:**
+```json
+{
+  "calendar_type": "ipo",
+  "start": "2024-01-01",
+  "end": "2024-03-31",
+  "limit": 50
+}
+```
+
+### Splits Calendar
+
+Monitor upcoming and historical stock split events.
+
+**Use cases:**
+- Track stock split announcements
+- Adjust portfolio holdings for splits
+- Analyze split ratios and company strategies
+- Identify companies making shares more accessible
+
+**Example:**
+```json
+{
+  "calendar_type": "splits",
+  "start": "2024-01-01",
+  "limit": 30
+}
+```
+
+### Economic Events Calendar
+
+Access scheduled economic data releases and government reports.
+
+**Use cases:**
+- Track Federal Reserve announcements
+- Monitor employment data (non-farm payrolls, unemployment)
+- Follow inflation indicators (CPI, PPI)
+- Plan trades around major economic releases
+- Analyze market reactions to economic data
+
+**Example:**
+```json
+{
+  "calendar_type": "economic_events",
+  "start": "2024-01-01",
+  "end": "2024-01-31",
+  "limit": 100
+}
+```
+
+## Filtering and Refinement
+
+### Filter by Market Cap
+
+Focus on larger, more established companies:
+
+```json
+{
+  "calendar_type": "earnings",
+  "market_cap": 50000000000,
+  "limit": 50
+}
+```
+
+This returns only earnings events for companies with market cap over $50B.
+
+### Most Active Securities
+
+Filter for high-liquidity stocks:
+
+```json
+{
+  "calendar_type": "earnings",
+  "filter_most_active": true,
+  "limit": 100
+}
+```
+
+### Custom Date Ranges
+
+Specify exact periods for analysis:
+
+```json
+{
+  "calendar_type": "splits",
+  "start": "2023-01-01",
+  "end": "2023-12-31",
+  "limit": 200
+}
+```
+
+## Response Structure
+
+Calendar responses vary by type but generally include:
+
+**Earnings:**
+- Company symbol and name
+- Earnings date and time (before/after market)
+- Expected EPS
+- Market cap
+
+**IPO:**
+- Company name and symbol
+- IPO date
+- Price range
+- Shares offered
+- Exchange
+
+**Splits:**
+- Symbol and company name
+- Split date
+- Split ratio (e.g., 2-for-1)
+- Type of split
+
+**Economic Events:**
+- Event name and description
+- Release date and time
+- Country/region
+- Importance/impact level
+- Previous value and forecast
+
+## Workflow Examples
+
+### Earnings Season Planning
+
+1. Fetch the week's earnings:
+```json
+{
+  "calendar_type": "earnings",
+  "start": "2024-01-22",
+  "end": "2024-01-26",
+  "market_cap": 20000000000,
+  "limit": 100
+}
+```
+
+2. Cross-reference with your portfolio holdings
+3. Review analyst expectations and price targets
+4. Plan trades or hedge positions accordingly
+
+### IPO Research
+
+1. Get upcoming IPOs for the quarter:
+```json
+{
+  "calendar_type": "ipo",
+  "start": "2024-01-01",
+  "end": "2024-03-31",
+  "limit": 50
+}
+```
+
+2. Research each company's S-1 filing
+3. Analyze pricing and valuation
+4. Monitor first-day trading performance
+
+### Economic Calendar Trading
+
+1. Identify key releases for the month:
+```json
+{
+  "calendar_type": "economic_events",
+  "start": "2024-02-01",
+  "end": "2024-02-29",
+  "limit": 100
+}
+```
+
+2. Focus on high-impact events (Fed meetings, employment data, inflation reports)
+3. Adjust positions ahead of releases
+4. Monitor market reactions
+
+## Best Practices
+
+<Tip>
+  Use `market_cap` filtering for earnings calendars to focus on companies that move the market. Small-cap earnings often have limited impact.
+</Tip>
+
+<Info>
+  Economic events don't have ticker symbols. Use this calendar to understand market-wide catalysts that affect all securities.
+</Info>
+
+<Warning>
+  Earnings dates can change. Always verify timing closer to the announcement date, especially for pre-market vs after-market releases.
+</Warning>
+
+<Tip>
+  Combine calendar data with other tools: use `yf_ticker_earnings_dates` for detailed historical earnings data on specific tickers.
+</Tip>

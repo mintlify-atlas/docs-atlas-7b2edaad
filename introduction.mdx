@@ -1,0 +1,89 @@
+---
+title: Introduction
+description: FinMCP provides AI assistants with comprehensive financial market data through 50+ yfinance tools via the Model Context Protocol
+---
+
+## What is FinMCP?
+
+FinMCP is an MCP (Model Context Protocol) server that exposes the powerful `yfinance` library to AI assistants, enabling them to access real-time and historical financial market data through a simple, standardized interface.
+
+With FinMCP, AI assistants can retrieve stock prices, financial statements, analyst recommendations, insider transactions, and much more—all through natural language interactions.
+
+<CardGroup cols={3}>
+  <Card title="Installation" icon="download" href="/installation">
+    Get started with FinMCP in minutes using npm or npx
+  </Card>
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Add FinMCP to Claude or OpenCode and run your first query
+  </Card>
+  <Card title="Tool Reference" icon="book" href="/tools">
+    Explore 50+ financial data tools available in FinMCP
+  </Card>
+</CardGroup>
+
+## Key Features
+
+<AccordionGroup>
+  <Accordion title="50+ Financial Data Tools">
+    Access comprehensive market data including:
+    - Real-time and historical stock prices
+    - Financial statements (income, balance sheet, cash flow)
+    - Analyst recommendations and price targets
+    - Insider transactions and institutional holdings
+    - Options chains and market calendars
+    - Sector and industry analysis
+    - Stock screening and discovery
+  </Accordion>
+
+  <Accordion title="Flexible Output Formats">
+    Choose how you want your data:
+    - **JSON** for programmatic access
+    - **Markdown** for readable tables and summaries
+    - **CSV/JSON export** to save data locally
+    - Configurable preview limits for large datasets
+  </Accordion>
+
+  <Accordion title="Real-Time Market Data">
+    Access live market data powered by yfinance:
+    - Current stock quotes and fast info
+    - Today's earnings calendars and IPO schedules
+    - Breaking news and research reports
+    - Market status across global exchanges
+  </Accordion>
+
+  <Accordion title="Built on MCP Standard">
+    Leverages the Model Context Protocol for:
+    - Standardized tool definitions
+    - Seamless integration with Claude, OpenCode, and other MCP clients
+    - Extensible architecture for future enhancements
+  </Accordion>
+</AccordionGroup>
+
+## What is MCP?
+
+The **Model Context Protocol (MCP)** is an open standard that enables AI assistants to securely connect to external data sources and tools. Instead of copying and pasting data or writing custom integrations, MCP provides a unified way for AI models to access information and perform actions.
+
+<Note>
+  FinMCP implements MCP to expose yfinance functionality, making financial data accessible to any MCP-compatible AI assistant.
+</Note>
+
+## Use Cases
+
+FinMCP enables AI assistants to help with:
+
+- **Investment Research**: Analyze stock fundamentals, compare companies, review analyst opinions
+- **Market Monitoring**: Track portfolio performance, set up earnings calendars, monitor insider activity
+- **Financial Analysis**: Generate reports from financial statements, calculate metrics, identify trends
+- **Stock Discovery**: Screen for stocks meeting specific criteria, explore sectors and industries
+- **Data Export**: Save market data to CSV or JSON for further analysis
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Install FinMCP" icon="download" href="/installation">
+    Set up FinMCP with npm and Python dependencies
+  </Card>
+  <Card title="Quick Start Guide" icon="play" href="/quickstart">
+    Run your first financial data query in minutes
+  </Card>
+</CardGroup>

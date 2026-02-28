@@ -1,0 +1,91 @@
+---
+title: Major Holders
+description: Get top holders overview for a ticker
+---
+
+## yf_ticker_major_holders
+
+Returns a summary of major ownership breakdown for a ticker, showing institutional, insider, and public holdings percentages.
+
+### Parameters
+
+<ParamField path="ticker" type="string" required>
+  Ticker symbol (e.g., "AAPL", "MSFT")
+</ParamField>
+
+<ParamField path="response_format" type="enum" default="json">
+  Output format: `json` or `markdown`
+</ParamField>
+
+<ParamField path="preview_limit" type="integer" default={25}>
+  Number of rows to preview in markdown format (max 200)
+</ParamField>
+
+<ParamField path="save" type="object">
+  Save results to file
+  <Expandable title="properties">
+    <ParamField path="format" type="enum" required>
+      File format: `csv` or `json`
+    </ParamField>
+    <ParamField path="filename" type="string">
+      Custom filename (auto-generated if omitted)
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+### Returns
+
+A DataFrame containing major ownership categories:
+
+- **insidersPercentHeld**: Percentage of shares held by insiders
+- **institutionsPercentHeld**: Percentage of shares held by institutions
+- **institutionsFloatPercentHeld**: Percentage of float held by institutions
+- **institutionsCount**: Number of institutional holders
+
+### Example Usage
+
+```typescript
+const result = await use_mcp_tool({
+  server_name: "finmcp",
+  tool_name: "yf_ticker_major_holders",
+  arguments: {
+    ticker: "AAPL",
+    response_format: "json"
+  }
+});
+```
+
+### Example Response
+
+```json
+{
+  "data": {
+    "__type__": "dataframe",
+    "columns": ["Value"],
+    "index": [
+      "insidersPercentHeld",
+      "institutionsPercentHeld",
+      "institutionsFloatPercentHeld",
+      "institutionsCount"
+    ],
+    "data": [
+      [0.0007],
+      [0.6142],
+      [0.6154],
+      [5983]
+    ]
+  }
+}
+```
+
+### Use Cases
+
+- Quickly assess ownership structure before making investment decisions
+- Compare institutional interest across different stocks
+- Identify heavily institutionally-held securities
+- Monitor changes in insider ownership over time
+
+### Related Tools
+
+- [yf_ticker_institutional_holders](/tools/ownership/institutional) - Detailed institutional holder data
+- [yf_ticker_insider_roster_holders](/tools/ownership/insider-transactions) - Current insider positions

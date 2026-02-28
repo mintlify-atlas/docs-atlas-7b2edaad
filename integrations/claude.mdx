@@ -1,0 +1,113 @@
+---
+title: Claude Desktop Integration
+description: Connect FinMCP to Claude Desktop to access financial data tools
+---
+
+Integrate FinMCP with Claude Desktop to access real-time financial market data and analysis tools directly in your conversations.
+
+## Prerequisites
+
+Before integrating FinMCP with Claude Desktop, ensure you have:
+
+- Claude Desktop installed
+- Node.js 18+ installed
+- Python 3.10+ installed
+- Python dependencies installed:
+
+```bash
+pip install -r mcp/python/requirements.txt
+```
+
+<Note>
+Server logs are written to stderr, while stdout is reserved for MCP transport communication.
+</Note>
+
+## Installation
+
+<Steps>
+  <Step title="Add FinMCP to Claude Desktop">
+    Use the Claude MCP command to add FinMCP to your configuration:
+
+    ```bash
+    claude mcp add finmcp -- npx -y finmcp
+    ```
+
+    This command automatically configures FinMCP in your Claude Desktop settings.
+  </Step>
+
+  <Step title="Verify Configuration">
+    The command will add the following configuration to your `claude_desktop_config.json`:
+
+    ```json claude_desktop_config.json
+    {
+      "mcpServers": {
+        "finmcp": {
+          "command": "npx",
+          "args": ["-y", "finmcp"]
+        }
+      }
+    }
+    ```
+
+    <Note>
+    The configuration file is typically located at:
+    - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+    - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+    </Note>
+  </Step>
+
+  <Step title="Restart Claude Desktop">
+    Close and restart Claude Desktop to load the FinMCP server.
+  </Step>
+
+  <Step title="Test the Integration">
+    Open a new conversation in Claude Desktop and try a financial query:
+
+    ```
+    What's the current stock price for AAPL?
+    ```
+
+    or
+
+    ```
+    Get me the historical data for TSLA for the last month
+    ```
+
+    Claude will use the FinMCP tools to fetch real-time financial data.
+  </Step>
+</Steps>
+
+## Available Tools
+
+Once integrated, Claude Desktop will have access to all FinMCP tools for:
+
+- Real-time stock quotes
+- Historical market data
+- Company fundamentals
+- Financial metrics and ratios
+- Market analysis
+
+## Troubleshooting
+
+### Server Not Loading
+
+If the FinMCP server doesn't load:
+
+1. Verify Python 3.10+ is installed: `python --version`
+2. Check that yfinance dependencies are installed
+3. Review Claude Desktop logs for error messages
+4. Ensure npx can access the finmcp package
+
+### Connection Issues
+
+If you see connection errors:
+
+- Restart Claude Desktop completely
+- Verify the configuration file syntax is correct
+- Check that the command path is accessible from your shell
+
+## Next Steps
+
+- Explore available [tools](/tools/overview) in FinMCP
+- Learn about [data sources](/data-sources) and market coverage
+- Check out [example queries](/examples) for inspiration

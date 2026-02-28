@@ -1,0 +1,403 @@
+---
+title: Custom MCP Client Integration
+description: Integrate FinMCP with custom MCP clients using the Model Context Protocol SDK
+---
+
+Build custom integrations with FinMCP using the Model Context Protocol SDK. This guide shows how to connect to FinMCP from any MCP-compatible client.
+
+## Prerequisites
+
+Before building a custom integration:
+
+- Node.js 18+ installed
+- Python 3.10+ installed
+- Python dependencies installed:
+
+```bash
+pip install -r mcp/python/requirements.txt
+```
+
+- MCP SDK installed in your project:
+
+```bash
+npm install @modelcontextprotocol/sdk
+```
+
+<Note>
+FinMCP uses `@modelcontextprotocol/sdk` version `^1.2.0`. Ensure your client uses a compatible version.
+</Note>
+
+## Architecture
+
+FinMCP uses the stdio transport mechanism, which means:
+
+- **stdin**: Receives MCP protocol messages
+- **stdout**: Sends MCP protocol responses
+- **stderr**: Outputs server logs (not part of MCP transport)
+
+Your client communicates with FinMCP by spawning the process and exchanging JSON-RPC messages over stdio.
+
+## Basic Integration
+
+<Steps>
+  <Step title="Install Dependencies">
+    Install the MCP SDK in your project:
+
+    ```bash
+    npm install @modelcontextprotocol/sdk
+    ```
+  </Step>
+
+  <Step title="Create Client Connection">
+    Create a client that connects to FinMCP via stdio transport:
+
+    ```typescript client.ts
+    import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+    import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+    import { spawn } from 'child_process';
+
+    // Create the FinMCP server process
+    const serverProcess = spawn('npx', ['-y', 'finmcp'], {
+      stdio: ['pipe', 'pipe', 'pipe'],
+      env: process.env
+    });
+
+    // Create stdio transport
+    const transport = new StdioClientTransport({
+      stdin: serverProcess.stdin,
+      stdout: serverProcess.stdout,
+      stderr: serverProcess.stderr
+    });
+
+    // Create and connect the client
+    const client = new Client({
+      name: 'my-finmcp-client',
+      version: '1.0.0'
+    }, {
+      capabilities: {}
+    });
+
+    await client.connect(transport);
+    ```
+  </Step>
+
+  <Step title="Discover Available Tools">
+    Query the server to discover available financial data tools:
+
+    ```typescript
+    // List all available tools
+    const toolsResponse = await client.listTools();
+
+    console.log('Available tools:');
+    toolsResponse.tools.forEach(tool => {
+      console.log(`- ${tool.name}: ${tool.description}`);
+    });
+    ```
+  </Step>
+
+  <Step title="Call Tools">
+    Invoke FinMCP tools to fetch financial data:
+
+    ```typescript
+    // Example: Get stock price
+    const result = await client.callTool({
+      name: 'get_stock_price',
+      arguments: {
+        symbol: 'AAPL'
+      }
+    });
+
+    console.log('Stock data:', result);
+    ```
+  </Step>
+
+  <Step title="Handle Cleanup">
+    Properly close the connection and terminate the server process:
+
+    ```typescript
+    // Close the client connection
+    await client.close();
+
+    // Terminate the server process
+    serverProcess.kill();
+    ```
+  </Step>
+</Steps>
+
+## Complete Example
+
+Here's a complete example of a custom FinMCP client:
+
+<CodeGroup>
+
+```typescript client.ts
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+import { spawn } from 'child_process';
+
+class FinMCPClient {
+  private client: Client;
+  private serverProcess: any;
+  private transport: StdioClientTransport;
+
+  async connect() {
+    // Spawn the FinMCP server
+    this.serverProcess = spawn('npx', ['-y', 'finmcp'], {
+      stdio: ['pipe', 'pipe', 'pipe'],
+      env: process.env
+    });
+
+    // Optionally log server errors
+    this.serverProcess.stderr.on('data', (data: Buffer) => {
+      console.error('FinMCP Server:', data.toString());
+    });
+
+    // Create transport
+    this.transport = new StdioClientTransport({
+      stdin: this.serverProcess.stdin,
+      stdout: this.serverProcess.stdout,
+      stderr: this.serverProcess.stderr
+    });
+
+    // Initialize client
+    this.client = new Client({
+      name: 'finmcp-custom-client',
+      version: '1.0.0'
+    }, {
+      capabilities: {}
+    });
+
+    // Connect to server
+    await this.client.connect(this.transport);
+    console.log('Connected to FinMCP server');
+  }
+
+  async listTools() {
+    const response = await this.client.listTools();
+    return response.tools;
+  }
+
+  async getStockPrice(symbol: string) {
+    const result = await this.client.callTool({
+      name: 'get_stock_price',
+      arguments: { symbol }
+    });
+    return result;
+  }
+
+  async getHistoricalData(symbol: string, period: string) {
+    const result = await this.client.callTool({
+      name: 'get_historical_data',
+      arguments: { symbol, period }
+    });
+    return result;
+  }
+
+  async close() {
+    await this.client.close();
+    this.serverProcess.kill();
+    console.log('Disconnected from FinMCP server');
+  }
+}
+
+// Usage example
+async function main() {
+  const finmcp = new FinMCPClient();
+  
+  try {
+    await finmcp.connect();
+    
+    // List available tools
+    const tools = await finmcp.listTools();
+    console.log('Available tools:', tools.map(t => t.name));
+    
+    // Get stock price
+    const price = await finmcp.getStockPrice('AAPL');
+    console.log('AAPL price:', price);
+    
+    // Get historical data
+    const history = await finmcp.getHistoricalData('TSLA', '1mo');
+    console.log('TSLA history:', history);
+    
+  } finally {
+    await finmcp.close();
+  }
+}
+
+main().catch(console.error);
+```
+
+```javascript client.js
+const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
+const { StdioClientTransport } = require('@modelcontextprotocol/sdk/client/stdio.js');
+const { spawn } = require('child_process');
+
+class FinMCPClient {
+  async connect() {
+    // Spawn the FinMCP server
+    this.serverProcess = spawn('npx', ['-y', 'finmcp'], {
+      stdio: ['pipe', 'pipe', 'pipe'],
+      env: process.env
+    });
+
+    // Log server errors
+    this.serverProcess.stderr.on('data', (data) => {
+      console.error('FinMCP Server:', data.toString());
+    });
+
+    // Create transport
+    this.transport = new StdioClientTransport({
+      stdin: this.serverProcess.stdin,
+      stdout: this.serverProcess.stdout,
+      stderr: this.serverProcess.stderr
+    });
+
+    // Initialize client
+    this.client = new Client({
+      name: 'finmcp-custom-client',
+      version: '1.0.0'
+    }, {
+      capabilities: {}
+    });
+
+    // Connect to server
+    await this.client.connect(this.transport);
+    console.log('Connected to FinMCP server');
+  }
+
+  async listTools() {
+    const response = await this.client.listTools();
+    return response.tools;
+  }
+
+  async callTool(name, args) {
+    return await this.client.callTool({
+      name: name,
+      arguments: args
+    });
+  }
+
+  async close() {
+    await this.client.close();
+    this.serverProcess.kill();
+    console.log('Disconnected from FinMCP server');
+  }
+}
+
+// Usage
+async function main() {
+  const finmcp = new FinMCPClient();
+  
+  try {
+    await finmcp.connect();
+    
+    const tools = await finmcp.listTools();
+    console.log('Tools:', tools.map(t => t.name));
+    
+    const result = await finmcp.callTool('get_stock_price', {
+      symbol: 'AAPL'
+    });
+    console.log('Result:', result);
+    
+  } finally {
+    await finmcp.close();
+  }
+}
+
+main().catch(console.error);
+```
+
+</CodeGroup>
+
+## Advanced Usage
+
+### Error Handling
+
+Implement robust error handling for production use:
+
+```typescript
+try {
+  const result = await client.callTool({
+    name: 'get_stock_price',
+    arguments: { symbol: 'INVALID' }
+  });
+} catch (error) {
+  if (error.code === 'TOOL_ERROR') {
+    console.error('Tool execution failed:', error.message);
+  } else if (error.code === 'TRANSPORT_ERROR') {
+    console.error('Connection issue:', error.message);
+  } else {
+    console.error('Unexpected error:', error);
+  }
+}
+```
+
+### Process Management
+
+Monitor the server process health:
+
+```typescript
+serverProcess.on('exit', (code, signal) => {
+  console.log(`FinMCP server exited with code ${code}`);
+  // Implement reconnection logic here
+});
+
+serverProcess.on('error', (error) => {
+  console.error('Failed to start FinMCP server:', error);
+});
+```
+
+### Using Global Installation
+
+If FinMCP is installed globally:
+
+```typescript
+const serverProcess = spawn('finmcp', [], {
+  stdio: ['pipe', 'pipe', 'pipe'],
+  env: process.env
+});
+```
+
+## SDK Reference
+
+Key classes from `@modelcontextprotocol/sdk`:
+
+- **Client**: Main MCP client class for connecting to servers
+- **StdioClientTransport**: Transport layer for stdio-based communication
+- **Tool**: Type definition for MCP tools
+- **CallToolRequest**: Request format for invoking tools
+
+Refer to the [MCP SDK documentation](https://github.com/modelcontextprotocol/sdk) for complete API details.
+
+## Troubleshooting
+
+### Server Not Starting
+
+If the server process fails to start:
+
+1. Verify FinMCP is accessible: `npx -y finmcp --version`
+2. Check Python 3.10+ is installed
+3. Ensure yfinance dependencies are installed
+4. Review stderr output for error messages
+
+### Connection Timeout
+
+If connection times out:
+
+- Increase timeout in transport configuration
+- Check server process is running: `serverProcess.pid`
+- Verify stdio pipes are properly configured
+
+### Tool Call Failures
+
+If tool calls fail:
+
+- Verify tool name is correct using `listTools()`
+- Check argument format matches tool schema
+- Review server logs on stderr for details
+
+## Next Steps
+
+- Explore available [tools](/tools/overview) in FinMCP
+- Learn about [MCP protocol](https://modelcontextprotocol.io) specifications
+- Check out [example integrations](/examples) for inspiration

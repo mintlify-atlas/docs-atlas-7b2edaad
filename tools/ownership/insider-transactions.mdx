@@ -1,0 +1,355 @@
+---
+title: Insider Transactions
+description: Track insider purchases, transactions, and current insider holdings
+---
+
+## Overview
+
+FinMCP provides three distinct tools for tracking insider activity. Understanding the differences between them is crucial for effective insider trading analysis.
+
+## yf_ticker_insider_purchases
+
+Returns **purchase-only** insider transactions, filtering out sales and other transaction types. This tool is ideal for identifying bullish insider sentiment.
+
+### Parameters
+
+<ParamField path="ticker" type="string" required>
+  Ticker symbol (e.g., "AAPL", "MSFT")
+</ParamField>
+
+<ParamField path="response_format" type="enum" default="json">
+  Output format: `json` or `markdown`
+</ParamField>
+
+<ParamField path="preview_limit" type="integer" default={25}>
+  Number of rows to preview in markdown format (max 200)
+</ParamField>
+
+<ParamField path="save" type="object">
+  Save results to file
+  <Expandable title="properties">
+    <ParamField path="format" type="enum" required>
+      File format: `csv` or `json`
+    </ParamField>
+    <ParamField path="filename" type="string">
+      Custom filename (auto-generated if omitted)
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+### Returns
+
+A DataFrame containing insider purchase details:
+
+- **Shares**: Number of shares purchased
+- **Value**: Dollar value of the purchase
+- **URL**: Link to SEC filing
+- **Text**: Description of the transaction
+
+### Example Usage
+
+```typescript
+const result = await use_mcp_tool({
+  server_name: "finmcp",
+  tool_name: "yf_ticker_insider_purchases",
+  arguments: {
+    ticker: "META",
+    response_format: "json"
+  }
+});
+```
+
+---
+
+## yf_ticker_insider_transactions
+
+Returns **all insider transactions**, including purchases, sales, option exercises, and other transaction types. Use this for comprehensive insider activity analysis.
+
+### Parameters
+
+<ParamField path="ticker" type="string" required>
+  Ticker symbol (e.g., "AAPL", "MSFT")
+</ParamField>
+
+<ParamField path="response_format" type="enum" default="json">
+  Output format: `json` or `markdown`
+</ParamField>
+
+<ParamField path="preview_limit" type="integer" default={25}>
+  Number of rows to preview in markdown format (max 200)
+</ParamField>
+
+<ParamField path="save" type="object">
+  Save results to file
+  <Expandable title="properties">
+    <ParamField path="format" type="enum" required>
+      File format: `csv` or `json`
+    </ParamField>
+    <ParamField path="filename" type="string">
+      Custom filename (auto-generated if omitted)
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+### Returns
+
+A DataFrame containing all insider transaction details:
+
+- **Insider**: Name of the insider
+- **Position**: Title/role at the company
+- **Date**: Transaction date
+- **Shares**: Number of shares transacted
+- **Value**: Dollar value of the transaction
+- **Transaction**: Type (Purchase, Sale, Option Exercise, etc.)
+- **URL**: Link to SEC filing
+
+### Example Usage
+
+```typescript
+const result = await use_mcp_tool({
+  server_name: "finmcp",
+  tool_name: "yf_ticker_insider_transactions",
+  arguments: {
+    ticker: "GOOGL",
+    response_format: "markdown",
+    preview_limit: 20
+  }
+});
+```
+
+### Example Response
+
+```json
+{
+  "data": {
+    "__type__": "dataframe",
+    "columns": ["Insider", "Position", "Date", "Shares", "Value", "Transaction", "URL"],
+    "index": [0, 1, 2],
+    "data": [
+      ["Jane Smith", "Chief Financial Officer", "2024-01-15", 10000, 1500000, "Sale", "https://www.sec.gov/..."],
+      ["John Doe", "Director", "2024-01-10", 5000, 750000, "Purchase", "https://www.sec.gov/..."],
+      ["Bob Johnson", "Chief Technology Officer", "2024-01-05", 25000, 3750000, "Option Exercise", "https://www.sec.gov/..."]
+    ]
+  }
+}
+```
+
+---
+
+## yf_ticker_insider_roster_holders
+
+Returns **current insider positions** (point-in-time snapshot), showing how many shares each insider currently holds. Unlike transaction data, this shows the cumulative position.
+
+### Parameters
+
+<ParamField path="ticker" type="string" required>
+  Ticker symbol (e.g., "AAPL", "MSFT")
+</ParamField>
+
+<ParamField path="response_format" type="enum" default="json">
+  Output format: `json` or `markdown`
+</ParamField>
+
+<ParamField path="preview_limit" type="integer" default={25}>
+  Number of rows to preview in markdown format (max 200)
+</ParamField>
+
+<ParamField path="save" type="object">
+  Save results to file
+  <Expandable title="properties">
+    <ParamField path="format" type="enum" required>
+      File format: `csv` or `json`
+    </ParamField>
+    <ParamField path="filename" type="string">
+      Custom filename (auto-generated if omitted)
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+### Returns
+
+A DataFrame containing current insider holdings:
+
+- **Name**: Insider name
+- **Position**: Title/role at the company
+- **Date**: Most recent report date
+- **Shares**: Total shares currently held
+- **Value**: Current market value of holdings
+- **% Out**: Percentage of outstanding shares
+
+### Example Usage
+
+```typescript
+const result = await use_mcp_tool({
+  server_name: "finmcp",
+  tool_name: "yf_ticker_insider_roster_holders",
+  arguments: {
+    ticker: "AMZN",
+    response_format: "json"
+  }
+});
+```
+
+### Example Response
+
+```json
+{
+  "data": {
+    "__type__": "dataframe",
+    "columns": ["Name", "Position", "Date", "Shares", "Value", "% Out"],
+    "index": [0, 1, 2],
+    "data": [
+      ["Jeffrey P. Bezos", "Executive Chairman", "2024-12-31", 987654321, 150000000000, 0.0950],
+      ["Andrew R. Jassy", "President and CEO", "2024-12-31", 12345678, 1875000000, 0.0012],
+      ["Brian T. Olsavsky", "Senior Vice President and CFO", "2024-12-31", 5432109, 825000000, 0.0005]
+    ]
+  }
+}
+```
+
+---
+
+## Key Differences
+
+<CardGroup cols={3}>
+  <Card title="Insider Purchases" icon="cart-shopping">
+    **What**: Purchase transactions only
+    
+    **When**: Looking for bullish signals
+    
+    **Shows**: Individual buy transactions
+  </Card>
+  
+  <Card title="Insider Transactions" icon="exchange">
+    **What**: All transaction types
+    
+    **When**: Comprehensive activity tracking
+    
+    **Shows**: Buys, sales, exercises, grants
+  </Card>
+  
+  <Card title="Insider Roster" icon="users">
+    **What**: Current total holdings
+    
+    **When**: Assessing current ownership
+    
+    **Shows**: Point-in-time positions
+  </Card>
+</CardGroup>
+
+### When to Use Each Tool
+
+**Use `yf_ticker_insider_purchases` when:**
+- Screening for stocks with recent insider buying
+- Looking for bullish insider sentiment signals
+- You only care about purchases, not sales
+- Building buy-side insider alerts
+
+**Use `yf_ticker_insider_transactions` when:**
+- You need a complete picture of insider activity
+- Analyzing both bullish and bearish signals
+- Tracking executive compensation events
+- Performing comprehensive insider trading analysis
+
+**Use `yf_ticker_insider_roster_holders` when:**
+- Assessing current insider ownership concentration
+- Comparing insider holdings across companies
+- Understanding management skin in the game
+- You need total positions, not individual trades
+
+---
+
+## Share Data Tools
+
+These tools complement ownership analysis by providing shares outstanding data.
+
+### yf_ticker_shares
+
+Returns the most recent shares outstanding data.
+
+#### Parameters
+
+<ParamField path="ticker" type="string" required>
+  Ticker symbol (e.g., "AAPL", "MSFT")
+</ParamField>
+
+<ParamField path="response_format" type="enum" default="json">
+  Output format: `json` or `markdown`
+</ParamField>
+
+<ParamField path="preview_limit" type="integer" default={25}>
+  Number of rows to preview in markdown format (max 200)
+</ParamField>
+
+<ParamField path="save" type="object">
+  Save results to file
+</ParamField>
+
+#### Returns
+
+Shares outstanding time series (recent data).
+
+---
+
+### yf_ticker_shares_full
+
+Returns the complete historical shares outstanding data with optional date filtering.
+
+#### Parameters
+
+<ParamField path="ticker" type="string" required>
+  Ticker symbol (e.g., "AAPL", "MSFT")
+</ParamField>
+
+<ParamField path="start" type="string">
+  Start date in YYYY-MM-DD format (e.g., "2020-01-01")
+</ParamField>
+
+<ParamField path="end" type="string">
+  End date in YYYY-MM-DD format (e.g., "2024-12-31")
+</ParamField>
+
+<ParamField path="response_format" type="enum" default="json">
+  Output format: `json` or `markdown`
+</ParamField>
+
+<ParamField path="preview_limit" type="integer" default={25}>
+  Number of rows to preview in markdown format (max 200)
+</ParamField>
+
+<ParamField path="save" type="object">
+  Save results to file
+</ParamField>
+
+#### Returns
+
+Complete historical shares outstanding time series.
+
+#### Example Usage
+
+```typescript
+const result = await use_mcp_tool({
+  server_name: "finmcp",
+  tool_name: "yf_ticker_shares_full",
+  arguments: {
+    ticker: "AAPL",
+    start: "2020-01-01",
+    end: "2024-12-31",
+    response_format: "json"
+  }
+});
+```
+
+#### Use Cases
+- Track share dilution or buyback programs over time
+- Calculate historical market capitalization
+- Analyze the impact of stock-based compensation
+- Normalize ownership percentages across different time periods
+
+---
+
+## Related Tools
+
+- [yf_ticker_major_holders](/tools/ownership/major-holders) - High-level ownership breakdown
+- [yf_ticker_institutional_holders](/tools/ownership/institutional) - Institutional ownership details
+- [yf_ticker_info](/tools/company/info) - Company info including shares outstanding

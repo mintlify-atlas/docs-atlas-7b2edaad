@@ -1,0 +1,184 @@
+---
+title: Institutional Ownership
+description: Get detailed institutional and mutual fund ownership data
+---
+
+## yf_ticker_institutional_holders
+
+Returns detailed information about institutional investors holding positions in a ticker, including investment firms, pension funds, and other institutional entities.
+
+### Parameters
+
+<ParamField path="ticker" type="string" required>
+  Ticker symbol (e.g., "AAPL", "MSFT")
+</ParamField>
+
+<ParamField path="response_format" type="enum" default="json">
+  Output format: `json` or `markdown`
+</ParamField>
+
+<ParamField path="preview_limit" type="integer" default={25}>
+  Number of rows to preview in markdown format (max 200)
+</ParamField>
+
+<ParamField path="save" type="object">
+  Save results to file
+  <Expandable title="properties">
+    <ParamField path="format" type="enum" required>
+      File format: `csv` or `json`
+    </ParamField>
+    <ParamField path="filename" type="string">
+      Custom filename (auto-generated if omitted)
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+### Returns
+
+A DataFrame containing institutional holder details:
+
+- **Holder**: Name of the institutional investor
+- **Shares**: Number of shares held
+- **Date Reported**: Date of the most recent filing
+- **% Out**: Percentage of outstanding shares
+- **Value**: Market value of the position
+
+### Example Usage
+
+```typescript
+const result = await use_mcp_tool({
+  server_name: "finmcp",
+  tool_name: "yf_ticker_institutional_holders",
+  arguments: {
+    ticker: "TSLA",
+    response_format: "markdown",
+    preview_limit: 10
+  }
+});
+```
+
+### Example Response
+
+```json
+{
+  "data": {
+    "__type__": "dataframe",
+    "columns": ["Holder", "Shares", "Date Reported", "% Out", "Value"],
+    "index": [0, 1, 2, 3, 4],
+    "data": [
+      ["Vanguard Group, Inc. (The)", 234567890, "2024-12-31", 0.0734, 45678901234],
+      ["Blackrock Inc.", 198765432, "2024-12-31", 0.0622, 38765432109],
+      ["State Street Corporation", 123456789, "2024-12-31", 0.0386, 24098765432],
+      ["Geode Capital Management, LLC", 98765432, "2024-12-31", 0.0309, 19265432109],
+      ["Capital International Investors", 87654321, "2024-12-31", 0.0274, 17109876543]
+    ]
+  }
+}
+```
+
+---
+
+## yf_ticker_mutualfund_holders
+
+Returns information about mutual funds holding positions in a ticker. This is useful for understanding retail-accessible fund exposure to a stock.
+
+### Parameters
+
+<ParamField path="ticker" type="string" required>
+  Ticker symbol (e.g., "AAPL", "MSFT")
+</ParamField>
+
+<ParamField path="response_format" type="enum" default="json">
+  Output format: `json` or `markdown`
+</ParamField>
+
+<ParamField path="preview_limit" type="integer" default={25}>
+  Number of rows to preview in markdown format (max 200)
+</ParamField>
+
+<ParamField path="save" type="object">
+  Save results to file
+  <Expandable title="properties">
+    <ParamField path="format" type="enum" required>
+      File format: `csv` or `json`
+    </ParamField>
+    <ParamField path="filename" type="string">
+      Custom filename (auto-generated if omitted)
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+### Returns
+
+A DataFrame containing mutual fund holder details:
+
+- **Holder**: Name of the mutual fund
+- **Shares**: Number of shares held
+- **Date Reported**: Date of the most recent filing
+- **% Out**: Percentage of outstanding shares
+- **Value**: Market value of the position
+
+### Example Usage
+
+```typescript
+const result = await use_mcp_tool({
+  server_name: "finmcp",
+  tool_name: "yf_ticker_mutualfund_holders",
+  arguments: {
+    ticker: "NVDA",
+    response_format: "json"
+  }
+});
+```
+
+### Example Response
+
+```json
+{
+  "data": {
+    "__type__": "dataframe",
+    "columns": ["Holder", "Shares", "Date Reported", "% Out", "Value"],
+    "index": [0, 1, 2, 3],
+    "data": [
+      ["Vanguard Total Stock Market Index Fund", 123456789, "2024-09-30", 0.0500, 15432109876],
+      ["Vanguard 500 Index Fund", 98765432, "2024-09-30", 0.0400, 12345678901],
+      ["Fidelity 500 Index Fund", 87654321, "2024-09-30", 0.0355, 10987654321],
+      ["SPDR S&P 500 ETF Trust", 76543210, "2024-09-30", 0.0310, 9876543210]
+    ]
+  }
+}
+```
+
+### Use Cases
+
+#### Institutional Holders
+- Identify smart money flows and institutional sentiment
+- Track changes in major institutional positions quarter-over-quarter
+- Assess institutional concentration risk
+- Research which firms are accumulating or reducing positions
+
+#### Mutual Fund Holders
+- Understand which retail-accessible funds provide exposure to a stock
+- Identify index fund holdings vs. active fund holdings
+- Compare fund weightings across different mutual fund families
+- Analyze potential selling pressure from fund redemptions
+
+### Differences
+
+**Institutional Holders** includes:
+- Investment management firms
+- Hedge funds
+- Pension funds
+- Insurance companies
+- Banks and financial institutions
+
+**Mutual Fund Holders** includes:
+- Registered mutual funds
+- ETFs
+- Index funds
+- Actively managed funds
+
+### Related Tools
+
+- [yf_ticker_major_holders](/tools/ownership/major-holders) - High-level ownership summary
+- [yf_ticker_insider_roster_holders](/tools/ownership/insider-transactions) - Insider ownership details

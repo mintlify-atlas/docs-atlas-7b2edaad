@@ -1,0 +1,218 @@
+---
+title: Company Research Workflow
+description: Deep dive into company fundamentals, financials, and analyst ratings
+---
+
+This example demonstrates how to research a company from scratch using FinMCP tools, from finding the ticker to analyzing financials and news.
+
+## Scenario: Researching a Company
+
+Let's say you heard about a company but only know its name. Here's how to conduct comprehensive research.
+
+### Step 1: Find the Ticker Symbol
+
+**Prompt to AI:**
+> "Find the ticker for Tesla"
+
+The AI uses `yf_search` to find the ticker:
+
+```json
+{
+  "query": "Tesla",
+  "max_results": 5
+}
+```
+
+**Response:** Returns search results showing TSLA as the ticker, along with related results.
+
+Alternatively, use `yf_lookup` for more specific searches:
+
+```json
+{
+  "query": "Tesla",
+  "kind": "stock",
+  "count": 10
+}
+```
+
+### Step 2: Get Company Overview
+
+**Prompt to AI:**
+> "Give me detailed information about Tesla"
+
+The AI uses `yf_ticker_info`:
+
+```json
+{
+  "ticker": "TSLA"
+}
+```
+
+**Response:** Returns comprehensive company data including:
+- Business description
+- Market cap and enterprise value
+- Employee count
+- Headquarters location
+- Industry and sector
+- Website and contact info
+- Key executives
+- Trading metrics (P/E ratio, beta, etc.)
+
+### Step 3: Analyze Financial Statements
+
+**Prompt to AI:**
+> "Show me Tesla's annual income statement"
+
+The AI uses `yf_ticker_income_stmt`:
+
+```json
+{
+  "ticker": "TSLA",
+  "freq": "yearly"
+}
+```
+
+**Response:** Returns annual income statement with revenue, expenses, net income, EPS, etc.
+
+**Prompt to AI:**
+> "What's Tesla's balance sheet look like? Show quarterly data"
+
+```json
+{
+  "ticker": "TSLA",
+  "freq": "quarterly"
+}
+```
+
+The AI uses `yf_ticker_balance_sheet` to show assets, liabilities, and equity.
+
+**Prompt to AI:**
+> "Show me Tesla's cash flow statement"
+
+```json
+{
+  "ticker": "TSLA",
+  "freq": "yearly"
+}
+```
+
+The AI uses `yf_ticker_cash_flow` to display operating, investing, and financing cash flows.
+
+### Step 4: Check Analyst Recommendations
+
+**Prompt to AI:**
+> "What are analysts saying about Tesla?"
+
+The AI uses `yf_ticker_recommendations`:
+
+```json
+{
+  "ticker": "TSLA"
+}
+```
+
+**Response:** Returns historical analyst recommendations (Strong Buy, Buy, Hold, Sell, Strong Sell) by firm and date.
+
+**Prompt to AI:**
+> "What's the analyst price target for Tesla?"
+
+```json
+{
+  "ticker": "TSLA"
+}
+```
+
+The AI uses `yf_ticker_analyst_price_targets` to show current, high, low, and mean price targets.
+
+### Step 5: Review Recent News
+
+**Prompt to AI:**
+> "Get the latest news about Tesla"
+
+The AI uses `yf_ticker_news`:
+
+```json
+{
+  "ticker": "TSLA"
+}
+```
+
+**Response:** Returns recent news articles with titles, publishers, links, and publish times.
+
+### Step 6: Examine Insider Activity
+
+**Prompt to AI:**
+> "Show me recent insider transactions for Tesla"
+
+The AI uses `yf_ticker_insider_transactions`:
+
+```json
+{
+  "ticker": "TSLA"
+}
+```
+
+**Response:** Returns insider buying and selling activity with names, dates, shares, and transaction values.
+
+### Step 7: Check Institutional Ownership
+
+**Prompt to AI:**
+> "Who are the major institutional holders of Tesla?"
+
+The AI uses `yf_ticker_institutional_holders`:
+
+```json
+{
+  "ticker": "TSLA"
+}
+```
+
+**Response:** Returns top institutional investors, their holdings, and recent changes.
+
+## Complete Research Workflow
+
+Here's a complete conversational flow:
+
+**You:** "I want to research Nvidia. Give me a complete overview."
+
+**AI response would use:**
+1. `yf_search` - Find ticker (NVDA)
+2. `yf_ticker_info` - Company basics
+3. `yf_ticker_income_stmt` - Recent financials
+4. `yf_ticker_recommendations_summary` - Analyst consensus
+5. `yf_ticker_news` - Latest headlines
+
+## Exporting Financial Data
+
+**Prompt to AI:**
+> "Export Tesla's annual income statement to a CSV file"
+
+```json
+{
+  "ticker": "TSLA",
+  "freq": "yearly",
+  "save": {
+    "format": "csv",
+    "filename": "tsla_income_stmt.csv"
+  }
+}
+```
+
+## Common Research Prompts
+
+- "What does Apple do? Give me the business description"
+- "Show me Microsoft's quarterly earnings history"
+- "Get the balance sheet for Amazon"
+- "What's the analyst consensus on Netflix?"
+- "Find recent upgrades and downgrades for Meta"
+- "Show me the dividend history for Coca-Cola"
+- "Get upcoming earnings dates for Alphabet"
+
+## Tips
+
+- Use `yf_ticker_fast_info` for quick key metrics without the full info dictionary
+- Set `freq: "quarterly"` for more recent financial data, `"yearly"` for annual trends
+- Check `yf_ticker_calendar` for upcoming earnings and ex-dividend dates
+- Use `yf_ticker_earnings_dates` with a `limit` parameter to see historical and future earnings dates
+- Combine `yf_ticker_upgrades_downgrades` and `yf_ticker_recommendations` for complete analyst coverage
+- Set `pretty: true` on financial statement tools for human-readable formatting

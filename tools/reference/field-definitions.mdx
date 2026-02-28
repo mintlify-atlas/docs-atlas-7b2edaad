@@ -1,0 +1,124 @@
+---
+title: 'Field Definitions'
+description: 'List all yfinance field definitions and valid modules'
+---
+
+## Overview
+
+The `yf_field_definitions` tool provides a complete reference of all available field definitions in yfinance, including which modules (data endpoints) support each field. This is essential for discovering what data is available and building valid queries.
+
+## Use Cases
+
+- **Discover available fields**: Browse all fields you can request from yfinance
+- **Validate field names**: Check exact field names before building queries
+- **Module compatibility**: See which data modules support specific fields
+- **Query building**: Find the right field names for screener queries and data requests
+
+## Parameters
+
+This tool accepts only output formatting parameters:
+
+<ParamField path="response_format" type="string" default="json">
+  Output format: `"json"` or `"markdown"`
+</ParamField>
+
+<ParamField path="preview_limit" type="number" default="25">
+  Number of rows to preview in markdown format (1-200)
+</ParamField>
+
+<ParamField path="save" type="object">
+  Save results to a file
+  
+  <Expandable title="properties">
+    <ParamField path="format" type="string" required>
+      File format: `"csv"` or `"json"`
+    </ParamField>
+    
+    <ParamField path="filename" type="string">
+      Output filename (defaults to auto-generated name)
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Response
+
+Returns a comprehensive list of field definitions with:
+
+- **Field name**: The exact field identifier
+- **Description**: What the field represents
+- **Valid modules**: Which yfinance data endpoints support this field
+- **Data type**: Expected data type for the field
+
+## Example Usage
+
+### Get All Field Definitions
+
+```json
+{
+  "response_format": "json"
+}
+```
+
+### Save Field Reference
+
+```json
+{
+  "response_format": "json",
+  "save": {
+    "format": "csv",
+    "filename": "yfinance-fields.csv"
+  }
+}
+```
+
+### Preview in Markdown
+
+```json
+{
+  "response_format": "markdown",
+  "preview_limit": 50
+}
+```
+
+## Response Example
+
+```json
+{
+  "data": [
+    {
+      "field": "marketCap",
+      "description": "Market capitalization",
+      "modules": ["price", "summaryDetail"],
+      "type": "number"
+    },
+    {
+      "field": "trailingPE",
+      "description": "Trailing price-to-earnings ratio",
+      "modules": ["summaryDetail"],
+      "type": "number"
+    },
+    {
+      "field": "dividendYield",
+      "description": "Dividend yield",
+      "modules": ["summaryDetail"],
+      "type": "number"
+    }
+  ],
+  "saved_path": null
+}
+```
+
+## Related Tools
+
+- [Field Categories](/tools/reference/field-categories) - Organize fields by category groups
+- [Screener](/tools/screening/screener) - Build custom screening queries using field definitions
+
+## Tips
+
+<Tip>
+  Use this tool when you're unsure about available field names or which modules support specific data points. It's especially helpful before building custom screener queries.
+</Tip>
+
+<Note>
+  Field availability may vary by ticker type (stock, ETF, mutual fund, etc.). Not all fields are available for all securities.
+</Note>

@@ -1,0 +1,111 @@
+---
+title: Market Summary
+description: Retrieve market summaries and trading status for global markets
+---
+
+## Overview
+
+The `yf_market` tool fetches market-level data including summaries and current trading status for global markets.
+
+## Tool Name
+
+`yf_market`
+
+## Parameters
+
+<ParamField path="market" type="string" required>
+  Market key identifier (e.g., 'EUROPE', 'US', 'ASIA')
+</ParamField>
+
+<ParamField path="item" type="enum" default="summary">
+  Type of market data to retrieve:
+  - `summary` - Market overview and summary statistics
+  - `status` - Current market trading status
+</ParamField>
+
+<ParamField path="response_format" type="enum" default="json">
+  Output format:
+  - `json` - Structured JSON data
+  - `markdown` - Formatted markdown tables
+</ParamField>
+
+<ParamField path="preview_limit" type="number" default={25}>
+  Number of rows to preview (1-200) when using markdown format
+</ParamField>
+
+<ParamField path="save" type="object">
+  Save options for exporting data:
+  <Expandable>
+    <ParamField path="format" type="enum" required>
+      Export format: `csv` or `json`
+    </ParamField>
+    <ParamField path="filename" type="string">
+      Custom filename for the saved file
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Market Keys
+
+Common market keys include:
+
+- **US** - United States markets
+- **EUROPE** - European markets
+- **ASIA** - Asian markets
+- **AMERICAS** - Americas region
+- **WORLD_INDICES** - Global indices
+
+## Response Format
+
+### Summary Item
+
+Returns comprehensive market statistics including:
+- Market indices performance
+- Trading volumes
+- Top gainers and losers
+- Market breadth indicators
+
+### Status Item
+
+Returns current trading status:
+- Market open/closed status
+- Trading hours
+- Market session information
+
+## Usage Examples
+
+<CodeGroup>
+
+```json Market Summary
+{
+  "market": "US",
+  "item": "summary",
+  "response_format": "json"
+}
+```
+
+```json Market Status
+{
+  "market": "EUROPE",
+  "item": "status"
+}
+```
+
+```json Save to CSV
+{
+  "market": "ASIA",
+  "item": "summary",
+  "save": {
+    "format": "csv",
+    "filename": "asia-market-summary.csv"
+  }
+}
+```
+
+</CodeGroup>
+
+## Related Tools
+
+- [Sectors](/tools/markets/sectors) - Analyze sector performance within markets
+- [Industries](/tools/markets/industries) - Industry-level market data
+- [Calendars](/tools/screening/calendars) - Market calendar events

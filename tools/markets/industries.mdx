@@ -1,0 +1,180 @@
+---
+title: Industries
+description: Access detailed industry-level market data and company performance
+---
+
+## Overview
+
+The `yf_industry` tool provides granular industry-level information, including performance metrics, top companies, and growth indicators within specific industries.
+
+## Tool Name
+
+`yf_industry`
+
+## Parameters
+
+<ParamField path="key" type="string" required>
+  Industry key identifier (e.g., 'software-infrastructure', 'biotechnology', 'semiconductors')
+</ParamField>
+
+<ParamField path="field" type="enum">
+  Specific industry field to retrieve. Available fields:
+  - `key` - Industry key identifier
+  - `name` - Industry display name
+  - `symbol` - Industry symbol
+  - `ticker` - Industry ticker representation
+  - `overview` - Comprehensive industry overview and statistics
+  - `top_companies` - Leading companies in the industry
+  - `research_reports` - Available research reports for the industry
+  - `sector_key` - Parent sector key identifier
+  - `sector_name` - Parent sector display name
+  - `top_performing_companies` - Best performing companies by returns
+  - `top_growth_companies` - Highest growth companies in the industry
+</ParamField>
+
+<ParamField path="response_format" type="enum" default="json">
+  Output format:
+  - `json` - Structured JSON data
+  - `markdown` - Formatted markdown tables
+</ParamField>
+
+<ParamField path="preview_limit" type="number" default={25}>
+  Number of rows to preview (1-200) when using markdown format
+</ParamField>
+
+<ParamField path="save" type="object">
+  Save options for exporting data:
+  <Expandable>
+    <ParamField path="format" type="enum" required>
+      Export format: `csv` or `json`
+    </ParamField>
+    <ParamField path="filename" type="string">
+      Custom filename for the saved file
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Common Industry Keys
+
+Industry keys follow a hyphenated format:
+
+**Technology Sector:**
+- `software-infrastructure`
+- `software-application`
+- `semiconductors`
+- `computer-hardware`
+- `electronics-computer-distribution`
+
+**Healthcare Sector:**
+- `biotechnology`
+- `drug-manufacturers-general`
+- `medical-devices`
+- `diagnostics-research`
+
+**Financial Services:**
+- `banks-regional`
+- `asset-management`
+- `insurance-diversified`
+- `credit-services`
+
+**Consumer:**
+- `auto-manufacturers`
+- `retail-apparel`
+- `restaurants`
+- `beverages-non-alcoholic`
+
+## Field Details
+
+### Overview
+Provides comprehensive industry statistics including:
+- Market capitalization
+- Performance metrics across multiple timeframes
+- Valuation ratios (P/E, P/B, P/S, PEG)
+- Growth rates and profitability metrics
+- Trading volume and momentum indicators
+
+### Top Companies
+Returns leading companies by market cap within the industry, including:
+- Company name and ticker symbol
+- Market capitalization
+- Price and performance data
+- Key financial metrics
+
+### Top Performing Companies
+Identifies companies with the strongest recent returns, useful for:
+- Momentum analysis
+- Identifying market leaders
+- Performance comparison
+
+### Top Growth Companies
+Highlights companies with highest growth rates in:
+- Revenue growth
+- Earnings growth
+- User/customer growth
+
+### Sector Relationship
+Use `sector_key` and `sector_name` to understand the parent sector and navigate between sector and industry levels.
+
+## Usage Examples
+
+<CodeGroup>
+
+```json Industry Overview
+{
+  "key": "software-infrastructure",
+  "field": "overview",
+  "response_format": "json"
+}
+```
+
+```json Top Industry Companies
+{
+  "key": "biotechnology",
+  "field": "top_companies",
+  "response_format": "markdown",
+  "preview_limit": 100
+}
+```
+
+```json Growth Leaders
+{
+  "key": "semiconductors",
+  "field": "top_growth_companies"
+}
+```
+
+```json Industry Performance
+{
+  "key": "asset-management",
+  "field": "top_performing_companies",
+  "save": {
+    "format": "csv",
+    "filename": "asset-mgmt-performers.csv"
+  }
+}
+```
+
+```json Parent Sector Info
+{
+  "key": "biotechnology",
+  "field": "sector_name"
+}
+```
+
+</CodeGroup>
+
+## Industry vs Sector
+
+Industries provide more granular data than sectors:
+
+- **Sector** (`technology`) → **Industries** (`software-infrastructure`, `semiconductors`, `software-application`)
+- **Sector** (`healthcare`) → **Industries** (`biotechnology`, `drug-manufacturers-general`, `medical-devices`)
+
+Use `yf_sector` with the `industries` field to discover all industries within a sector.
+
+## Related Tools
+
+- [Sectors](/tools/markets/sectors) - Parent sector-level analysis
+- [Market Summary](/tools/markets/market-summary) - Market-wide data
+- [Screener](/tools/screening/screener) - Screen for companies within industries
+- [Search](/tools/screening/search) - Find specific companies and tickers
